@@ -1,0 +1,309 @@
+.app-header {
+    background: none;
+    border-bottom: none;
+    box-shadow: none;
+    padding: 16px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 80px;
+    max-width: 1450px; /* Alinhar com o layout principal */
+    margin: 0 auto;
+    width: 100%;
+}
+
+.header-container {
+    max-width: 1450px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+}
+
+.climadata-logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo-image {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.search-container {
+    position: relative;
+    margin-right: 12px;
+}
+
+.search-input-container {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 300px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.search-results {
+    max-height: 200px;
+    overflow-y: auto;
+    border-top: 1px solid #eee;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.search-result-item:hover {
+    background-color: #f5f5f5;
+}
+
+.location-icon {
+    font-size: 14px;
+    color: #666;
+}
+
+.location-name {
+    color: #333;
+    font-size: 14px;
+}
+
+.search-loading {
+    padding: 12px 16px;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    font-style: italic;
+}
+
+.search-button {
+    background: #007acc;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 48px;
+}
+
+.search-button:hover {
+    background: #005fa3;
+}
+
+.search-button.active {
+    background: #005fa3;
+}
+
+.search-button.active:hover {
+    background: #005fa3;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.control-group label {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.controls-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.location-select {
+    min-width: 160px;
+}
+
+.time-select {
+    min-width: 140px;
+}
+
+.date-select {
+    min-width: 140px;
+}
+
+.report-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.report-section label {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.report-time-select {
+    min-width: 160px;
+}
+
+.header-search {
+    display: flex;
+    align-items: center;
+}
+
+.search-button {
+    background: #f8f9fa;
+    border: 2px solid #e0e6ed;
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+}
+
+.search-button:hover {
+    background: #e9ecef;
+    border-color: #007acc;
+}
+.nav-item:nth-child(5) { width: 80px; }
+
+/* Responsiveness */
+@media (max-width: 1024px) {
+    .app-header {
+        padding: 12px 18px;
+    }
+    
+    .logo-square {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .header-nav {
+        gap: 8px;
+    }
+    
+    .nav-item {
+        height: 34px;
+    }
+    
+    .nav-item:nth-child(1),
+    .nav-item:nth-child(2),
+    .nav-item:nth-child(3),
+    .nav-item:nth-child(5) { 
+        width: 75px; 
+    }
+    
+    .nav-item.long { 
+        width: 180px; 
+    }
+}
+
+@media (max-width: 768px) {
+    .app-header {
+        padding: 10px 15px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .logo-square {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+    }
+    
+    .header-nav {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    
+    .nav-item {
+        height: 30px;
+    }
+    
+    .nav-item:nth-child(1),
+    .nav-item:nth-child(2),
+    .nav-item:nth-child(3),
+    .nav-item:nth-child(5) { 
+        width: 65px; 
+    }
+    
+    .nav-item.long { 
+        width: 140px; 
+    }
+}
+
+@media (max-width: 480px) {
+    .app-header {
+        padding: 8px 12px;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .header-brand {
+        align-self: flex-start;
+    }
+    
+    .logo-square {
+        width: 28px;
+        height: 28px;
+        border-radius: 5px;
+    }
+    
+    .header-nav {
+        width: 100%;
+        justify-content: center;
+        gap: 5px;
+    }
+    
+    .nav-item {
+        height: 28px;
+        flex: 1;
+        min-width: 50px;
+    }
+    
+    .nav-item:nth-child(1),
+    .nav-item:nth-child(2),
+    .nav-item:nth-child(3),
+    .nav-item:nth-child(5) { 
+        width: auto;
+        max-width: 60px;
+    }
+    
+    .nav-item.long { 
+        width: auto;
+        flex: 2;
+        max-width: 120px;
+    }
+}
