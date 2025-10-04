@@ -1,0 +1,143 @@
+.weather-card {
+    background: white;
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 20px;
+    height: fit-content;
+}
+
+.weather-text-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.weather-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #1a1a1a;
+}
+
+.weather-subtitle {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+/* Container das 3 caixinhas pequenas */
+.weather-main-info {
+    display: flex;
+    gap: 12px;        /* espaço entre caixinhas */
+    flex-wrap: wrap;  /* permite quebrar linha em telas pequenas */
+    justify-content: flex-start;
+    margin-top: 5%;
+}
+
+/* Cada caixinha individual */
+.weather-main-info > p {
+    background: white;
+    padding: 10px 12px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-align: center;
+    width: 200px;      /* tamanho fixo igual para todas */
+    flex-shrink: 0;    /* não encolhe */
+}
+
+/* Texto dentro das caixinhas */
+.temperature {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.rain-chance {
+    font-size: 1rem;
+    color: #666;
+}
+
+.location {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+/* Ilustração */
+.weather-illustration {
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+}
+
+.weather-illustration img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .weather-card {
+        padding: 16px;
+    }
+
+    .weather-title {
+        font-size: 1.6rem;
+    }
+
+    .weather-illustration {
+        width: 130px;
+        height: 130px;
+    }
+}
+
+@media (max-width: 480px) {
+    .weather-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 16px;
+    }
+
+    .weather-illustration {
+        width: 110px;
+        height: 110px;
+        order: -1;
+    }
+
+    .weather-main-info {
+        flex-direction: column; /* empilha caixinhas */
+        align-items: center;
+        gap: 12px;
+    }
+
+    .weather-main-info > p {
+        width: 100px; /* menor em mobile */
+    }
+
+    .temperature {
+        font-size: 1.6rem;
+    }
+
+    .weather-title {
+        font-size: 1.4rem;
+    }
+
+    .weather-subtitle {
+        font-size: 0.9rem;
+    }
+}
