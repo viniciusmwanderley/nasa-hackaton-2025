@@ -23,6 +23,7 @@ dependencies = [
     "pytest>=8.4.2",
     "pytest-asyncio>=1.2.0",
     "numpy>=1.24.0",
+    "openai>=2.1.0",
 ]
 
 [project.scripts]
