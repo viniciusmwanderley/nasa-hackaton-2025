@@ -178,7 +178,14 @@ class TestRiskEndpointFull:
             total_samples=1,
             years_with_data=1,
             coverage_adequate=True,
-            timezone_iana="America/Fortaleza"
+            timezone_iana="America/Fortaleza",
+            target_latitude=-3.7,
+            target_longitude=-38.5,
+            target_date=date(2023, 6, 15),
+            target_hour=12,
+            window_days=15,
+            baseline_years=(2015, 2024),
+            total_years_requested=10
         )
         
         mock_collect_samples.return_value = mock_collection
@@ -232,7 +239,14 @@ class TestRiskEndpointFull:
             total_samples=1,
             years_with_data=1,
             coverage_adequate=True,
-            timezone_iana="America/Fortaleza"
+            timezone_iana="America/Fortaleza",
+            target_latitude=-3.7,
+            target_longitude=-38.5,
+            target_date=date(2023, 6, 15),
+            target_hour=12,
+            window_days=15,
+            baseline_years=(2015, 2024),
+            total_years_requested=10
         )
         
         mock_collect_samples.return_value = mock_collection
@@ -309,7 +323,14 @@ class TestDistributionsAndTrendsIntegration:
             total_samples=1,
             years_with_data=1,
             coverage_adequate=True,
-            timezone_iana="America/Fortaleza"
+            timezone_iana="America/Fortaleza",
+            target_latitude=-3.7,
+            target_longitude=-38.5,
+            target_date=date(2023, 6, 15),
+            target_hour=12,
+            window_days=15,
+            baseline_years=(2015, 2024),
+            total_years_requested=10
         )
         
         mock_collect_samples.return_value = mock_collection

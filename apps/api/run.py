@@ -3,4 +3,5 @@
 
 if __name__ == "__main__":
     from app.main import run_dev_server
+
     run_dev_server()

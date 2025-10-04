@@ -1,13 +1,16 @@
 # ABOUTME: Conversão do notebook mock_processing.ipynb para script Python standalone.
 # ABOUTME: Fornece função analyze_weather e bloco de execução demonstrativo (mock inicial de desenho futuro).
 
-import time, random, re, json  # noqa: E401,E402
 import datetime as dt
-from typing import Dict, List, Optional, Any
+import json
+import random
+import time  # noqa: E401,E402
 from enum import Enum
+from typing import Any
 
-import requests  # type: ignore
 import numpy as np  # type: ignore
+import requests  # type: ignore
+
 
 # --------------- 1. Constantes e Tipos (sem alterações) ---------------
 class Granularity(Enum):
@@ -29,6 +32,7 @@ API_PATHS = {
 DEFAULT_PARAMS = ["T2M", "T2M_MAX", "T2M_MIN", "PRECTOTCORR", "RH2M", "WS10M"]
 DEFAULT_COMMUNITY = "SB"
 
+
 # --------------- 2. Helper HTTP com Retry (sem alterações) ---------------
 def http_get(url: str, params: dict, retries: int = 4, timeout: int = 120) -> dict:
     """Faz uma requisição GET com tentativas e medição de tempo."""
@@ -43,7 +47,11 @@ def http_get(url: str, params: dict, retries: int = 4, timeout: int = 120) -> di
             )
             return r.json()
         except requests.RequestException as e:  # pragma: no cover (network variability)
-            is_retryable = "r" not in locals() or r.status_code in (429,) or 500 <= r.status_code < 600
+            is_retryable = (
+                "r" not in locals()
+                or r.status_code in (429,)
+                or 500 <= r.status_code < 600
+            )
             if attempt == retries - 1 or not is_retryable:
                 print(
                     f"Erro na requisição: {r.status_code if 'r' in locals() else 'N/A'} - {r.text if 'r' in locals() else e}"
@@ -60,8 +68,8 @@ def fetch_temporal_data(
     granularity: Granularity,
     start_date: dt.date,
     end_date: dt.date,
-    parameters: List[str],
-) -> Dict[str, Any]:
+    parameters: list[str],
+) -> dict[str, Any]:
     path = API_PATHS[granularity]
     params = {
         "latitude": lat,
@@ -74,7 +82,8 @@ def fetch_temporal_data(
     }
     return http_get(f"{BASE_URL}/{path}", params)
 
-def fetch_climatology(lat: float, lon: float, parameters: List[str]) -> Dict[str, Any]:
+
+def fetch_climatology(lat: float, lon: float, parameters: list[str]) -> dict[str, Any]:
     path = API_PATHS["climatology"]
     params = {
         "latitude": lat,
@@ -87,7 +96,7 @@ def fetch_climatology(lat: float, lon: float, parameters: List[str]) -> Dict[str
 
 
 # --------------- 4. Funções de Análise e Extração (sem alterações) ---------------
-def extract_param_series(json_obj: Dict[str, Any]) -> Dict[str, Dict[str, float]]:
+def extract_param_series(json_obj: dict[str, Any]) -> dict[str, dict[str, float]]:
     try:
         params = json_obj["properties"]["parameter"]
         for param, series in params.items():
@@ -99,11 +108,13 @@ def extract_param_series(json_obj: Dict[str, Any]) -> Dict[str, Dict[str, float]
         return {}
 
 
-def extract_climatology_monthly(json_obj: Dict[str, Any]) -> Dict[str, Dict[int, float]]:
+def extract_climatology_monthly(
+    json_obj: dict[str, Any],
+) -> dict[str, dict[int, float]]:
     param_series = extract_param_series(json_obj)
-    result: Dict[str, Dict[int, float]] = {}
+    result: dict[str, dict[int, float]] = {}
     for param, monthly_data in param_series.items():
-        month_map: Dict[int, float] = {}
+        month_map: dict[int, float] = {}
         for month_key, value in monthly_data.items():
             if month_key.isdigit() and 1 <= int(month_key) <= 12:
                 month_num = int(month_key)
@@ -120,7 +131,7 @@ def extract_climatology_monthly(json_obj: Dict[str, Any]) -> Dict[str, Dict[int,
     return result
 
 
-def basic_stats(values: List[float]) -> Dict[str, float]:
+def basic_stats(values: list[float]) -> dict[str, float]:
     valid_values = [v for v in values if v is not None and not np.isnan(v)]
     if not valid_values:
         keys = [
@@ -152,14 +163,16 @@ def basic_stats(values: List[float]) -> Dict[str, float]:
 
 
 def filter_series_by_datetime(
-    series: Dict[str, float],
+    series: dict[str, float],
     target_dt: dt.datetime,
     granularity: Granularity,
     window_days: int,
-) -> List[float]:
+) -> list[float]:
     target_doy = target_dt.timetuple().tm_yday
-    doy_range = {(target_doy + i - 1) % 365 + 1 for i in range(-window_days, window_days + 1)}
-    values: List[float] = []
+    doy_range = {
+        (target_doy + i - 1) % 365 + 1 for i in range(-window_days, window_days + 1)
+    }
+    values: list[float] = []
     date_format = "%Y%m%d" if granularity == Granularity.DAILY else "%Y%m%d%H"
     for date_str, value in series.items():
         if value is None:
@@ -167,7 +180,9 @@ def filter_series_by_datetime(
         try:
             d = dt.datetime.strptime(date_str, date_format)
             is_in_day_window = d.timetuple().tm_yday in doy_range
-            is_correct_hour = True if granularity == Granularity.DAILY else d.hour == target_dt.hour
+            is_correct_hour = (
+                True if granularity == Granularity.DAILY else d.hour == target_dt.hour
+            )
             if is_in_day_window and is_correct_hour:
                 values.append(float(value))
         except (ValueError, TypeError):  # pragma: no cover (defensive)
@@ -175,7 +190,7 @@ def filter_series_by_datetime(
     return values
 
 
-def calculate_heat_index(temp_c: float, rh_percent: float) -> Optional[float]:
+def calculate_heat_index(temp_c: float, rh_percent: float) -> float | None:
     if temp_c is None or rh_percent is None or np.isnan(temp_c) or np.isnan(rh_percent):
         return None
     if temp_c < 26.7 or rh_percent < 40:
@@ -190,7 +205,7 @@ def calculate_heat_index(temp_c: float, rh_percent: float) -> Optional[float]:
         - 5.481717e-2 * rh_percent**2
         + 1.22874e-3 * t_f**2 * rh_percent
         + 8.5282e-4 * t_f * rh_percent**2
-        - 1.99e-6 * t_f*2 * rh_percent*2
+        - 1.99e-6 * t_f * 2 * rh_percent * 2
     )
     return (hi_f - 32) * 5 / 9
 
@@ -201,11 +216,11 @@ def analyze_weather(
     lon: float,
     target_dt: dt.datetime,
     granularity: Granularity = Granularity.DAILY,
-    parameters: Optional[List[str]] = None,
+    parameters: list[str] | None = None,
     start_year: int = 2005,
     window_days: int = 7,
     hourly_chunk_years: int = 5,  # <--- NOVO PARÂMETRO: Define o tamanho do chunk em anos
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     if parameters is None:
         parameters = DEFAULT_PARAMS
     params_to_fetch = list(parameters)
@@ -215,7 +230,7 @@ def analyze_weather(
     required_params = {"T2M", "RH2M"}
     params_to_fetch = list(set(params_to_fetch) | required_params)
 
-    end_date = dt.datetime.now(dt.timezone.utc).date()
+    end_date = dt.datetime.now(dt.UTC).date()
     start_date = dt.date(start_year, 1, 1)
 
     print("Buscando dados de climatologia...")
@@ -223,12 +238,14 @@ def analyze_weather(
     clim_map = extract_climatology_monthly(clim_json)
     print("Dados de climatologia obtidos.")
 
-    all_series: Dict[str, Dict[str, float]] = {p: {} for p in params_to_fetch}
+    all_series: dict[str, dict[str, float]] = {p: {} for p in params_to_fetch}
 
     historical_fetch_start = time.perf_counter()
 
     if granularity == Granularity.DAILY:
-        print(f"Buscando dados 'daily' de {start_date} a {end_date} em uma única requisição...")
+        print(
+            f"Buscando dados 'daily' de {start_date} a {end_date} em uma única requisição..."
+        )
         try:
             historical_json = fetch_temporal_data(
                 lat, lon, granularity, start_date, end_date, params_to_fetch
@@ -251,7 +268,12 @@ def analyze_weather(
             )
             try:
                 chunk = fetch_temporal_data(
-                    lat, lon, granularity, chunk_start_date, chunk_end_date, params_to_fetch
+                    lat,
+                    lon,
+                    granularity,
+                    chunk_start_date,
+                    chunk_end_date,
+                    params_to_fetch,
                 )
                 param_block = extract_param_series(chunk)
                 for p, series in param_block.items():
@@ -276,11 +298,11 @@ def analyze_weather(
     ):
         mode = AnalysisMode.OBSERVED
 
-    results: Dict[str, Any] = {}
+    results: dict[str, Any] = {}
     for p in params_to_fetch:
         series = all_series.get(p, {})
         climatology_mean = clim_map.get(p, {}).get(target_dt.month)
-        entry: Dict[str, Any] = {
+        entry: dict[str, Any] = {
             "mode": mode.value,
             "climatology_month_mean": climatology_mean,
         }
@@ -295,7 +317,7 @@ def analyze_weather(
             entry["sample_size"] = stats.get("count", 0)
         results[p] = entry
 
-    derived_insights: Dict[str, Any] = {}
+    derived_insights: dict[str, Any] = {}
     if "T2M" in results and "RH2M" in results:
         t2m_data, rh2m_data = results["T2M"], results["RH2M"]
         heat_index_note = (
@@ -374,7 +396,7 @@ if _name_ == "_main_":  # pragma: no cover (exemplo / manual)
     print("\n\n")
 
     # --- Exemplo 2: Análise OBSERVADA DIÁRIA ---
-    past_date = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=365)
+    past_date = dt.datetime.now(dt.UTC) - dt.timedelta(days=365)
 
     print("=" * 60)
     print(

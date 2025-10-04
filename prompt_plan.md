@@ -295,7 +295,7 @@ Goal: Add distributions (histograms) and annual exceedance trend series.
 3) Tests: deterministic inputs hitting known bins and a monotone trend; assert payload.
 ```
 
-### Prompt 12 — `/export` CSV/JSON
+### Prompt 12 — `/export` CSV/JSON - COMPLETE
 ```text
 Goal: Export one row per hourly sample with provenance and flags.
 
