@@ -1,0 +1,89 @@
+.action-bar-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0;
+    background: none;
+    margin-top: 12px;
+}
+
+.report-button,
+.export-button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 1;
+}
+
+.report-button {
+    background: #3b82f6;
+    color: white;
+}
+
+.report-button:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.export-button {
+    background: white;
+    color: #3b82f6;
+    border: 2px solid #3b82f6;
+}
+
+.export-button:hover {
+    background: #3b82f6;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+/* Responsiveness */
+@media (max-width: 1024px) {
+    .action-bar-container {
+        gap: 8px;
+        margin-top: 6px;
+    }
+    
+    .report-button,
+    .export-button {
+        padding: 9px 14px;
+        font-size: 0.8rem;
+        max-width: 120px;
+    }
+}
+
+@media (max-width: 768px) {
+    .action-bar-container {
+        gap: 6px;
+        margin-top: 8px;
+    }
+    
+    .report-button,
+    .export-button {
+        padding: 8px 12px;
+        font-size: 0.75rem;
+        max-width: 110px;
+    }
+}
+
+@media (max-width: 480px) {
+    .action-bar-container {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 10px;
+    }
+    
+    .report-button,
+    .export-button {
+        width: 100%;
+        max-width: none;
+        padding: 10px 16px;
+        font-size: 0.8rem;
+    }
+}
