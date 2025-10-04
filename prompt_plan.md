@@ -286,7 +286,7 @@ Goal: Wire inputs → sampling → metrics → probabilities; return lean JSON.
 3) Tests: integration with mocked clients producing deterministic arrays; assert JSON shape and values.
 ```
 
-### Prompt 11 — `/risk?detail=full` (distributions + trends)
+### Prompt 11 — `/risk?detail=full` (distributions + trends) - COMPLETE
 ```text
 Goal: Add distributions (histograms) and annual exceedance trend series.
 

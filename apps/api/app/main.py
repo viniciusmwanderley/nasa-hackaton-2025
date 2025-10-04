@@ -6,6 +6,7 @@ import time
 import logging
 from typing import Callable
 from fastapi import FastAPI, Request, Response, HTTPException
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -15,10 +16,15 @@ from pythonjsonlogger import jsonlogger
 from app.config import Settings
 from app.models import (
     RiskRequest, RiskResponseLean, RiskResponseFull, ErrorResponse,
-    ConditionProbability, ConfidenceInterval, SampleStatistics, ConditionThresholds
+    ConditionProbability, ConfidenceInterval, SampleStatistics, ConditionThresholds,
+    ExportRequest
 )
 from app.analysis.distributions import calculate_distributions
 from app.analysis.trends import calculate_all_trends
+from app.export.exporter import (
+    create_export_rows, export_to_csv, export_to_json,
+    generate_export_filename, get_content_type, validate_export_data
+)
 from app.engine.samples import collect_samples, InsufficientCoverageError
 from app.analysis.probability import calculate_probability
 from app.weather.calculations import heat_index, wind_chill
@@ -291,6 +297,120 @@ async def assess_risk(request: Request, risk_request: RiskRequest):
         raise HTTPException(
             status_code=500,
             detail="Internal server error during risk assessment"
+        )
+
+
+@app.post("/export")
+@limiter.limit(settings.rate_limit_export)
+async def export_data(request: Request, export_request: ExportRequest):
+    """
+    Export weather sample data in CSV or JSON format.
+    
+    Provides detailed sample-by-sample data including all meteorological
+    parameters, calculated indices, and condition flags for the specified
+    location, date, and time window.
+    
+    Rate limited to prevent abuse - stricter than general API endpoints.
+    """
+    try:
+        logger = logging.getLogger("outdoor_risk_api")
+        request_id = getattr(request.state, 'request_id', 'unknown')
+        
+        logger.info(
+            f"Data export requested for ({export_request.latitude}, {export_request.longitude}) "
+            f"on {export_request.target_date} at {export_request.target_hour}:00 "
+            f"in {export_request.format} format",
+            extra={"request_id": request_id}
+        )
+        
+        # Collect historical weather samples (same as risk assessment)
+        try:
+            sample_collection = await collect_samples(
+                latitude=export_request.latitude,
+                longitude=export_request.longitude,
+                target_date_str=export_request.target_date,
+                target_hour=export_request.target_hour,
+                window_days=export_request.window_days,
+                settings=settings
+            )
+        except InsufficientCoverageError as e:
+            logger.warning(f"Insufficient coverage for export: {e}", extra={"request_id": request_id})
+            raise HTTPException(
+                status_code=422,
+                detail=f"Insufficient historical data coverage: {e}"
+            )
+        except ValueError as e:
+            logger.error(f"Invalid export parameters: {e}", extra={"request_id": request_id})
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            logger.error(f"Sample collection failed for export: {e}", extra={"request_id": request_id})
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to collect weather samples for export"
+            )
+        
+        # Create export rows with all sample details
+        try:
+            export_rows = create_export_rows(sample_collection, settings)
+            
+            # Validate export data
+            validation_result = validate_export_data(export_rows)
+            if not validation_result["valid"]:
+                logger.error(
+                    f"Export data validation failed: {validation_result}", 
+                    extra={"request_id": request_id}
+                )
+                raise HTTPException(
+                    status_code=500,
+                    detail="Export data validation failed"
+                )
+            
+            # Generate export content based on format
+            if export_request.format == "csv":
+                content = export_to_csv(export_rows)
+                content_type = get_content_type("csv")
+            elif export_request.format == "json":
+                content = export_to_json(export_rows)
+                content_type = get_content_type("json")
+            else:
+                raise HTTPException(status_code=400, detail="Invalid export format")
+            
+            # Generate filename for download
+            filename = generate_export_filename(
+                export_request.latitude,
+                export_request.longitude,
+                export_request.target_date,
+                export_request.target_hour,
+                export_request.format
+            )
+            
+            logger.info(
+                f"Export completed: {len(export_rows)} samples exported as {export_request.format}",
+                extra={"request_id": request_id}
+            )
+            
+            # Return file as download
+            return StreamingResponse(
+                iter([content.encode()]),
+                media_type=content_type,
+                headers={"Content-Disposition": f"attachment; filename={filename}"}
+            )
+            
+        except Exception as e:
+            logger.error(f"Export processing failed: {e}", extra={"request_id": request_id})
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to process export data"
+            )
+        
+    except HTTPException:
+        # Re-raise HTTP exceptions without wrapping
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error in data export: {e}", extra={"request_id": request_id})
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error during data export"
         )
 
 

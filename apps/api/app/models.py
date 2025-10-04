@@ -166,6 +166,84 @@ class RiskResponseFull(RiskResponseLean):
     trends: List[Trend] = Field(description="Annual exceedance trends")
 
 
+class ExportRequest(BaseModel):
+    """Request model for data export."""
+    
+    latitude: float = Field(
+        ..., 
+        ge=-90, 
+        le=90, 
+        description="Latitude in decimal degrees (-90 to 90)"
+    )
+    longitude: float = Field(
+        ..., 
+        ge=-180, 
+        le=180, 
+        description="Longitude in decimal degrees (-180 to 180)"
+    )
+    target_date: str = Field(
+        ..., 
+        description="Target date in YYYY-MM-DD format"
+    )
+    target_hour: int = Field(
+        ..., 
+        ge=0, 
+        le=23, 
+        description="Target local hour (0-23)"
+    )
+    window_days: int = Field(
+        default=15, 
+        ge=1, 
+        le=30, 
+        description="Days before/after target DOY to include (1-30)"
+    )
+    format: str = Field(
+        default="csv", 
+        description="Export format: 'csv' or 'json'"
+    )
+    
+    @field_validator('target_date')
+    @classmethod
+    def validate_target_date(cls, v: str) -> str:
+        """Validate target_date is in correct format and is a valid date."""
+        try:
+            # This will raise ValueError if format is wrong
+            parsed_date = date.fromisoformat(v)
+            return v
+        except ValueError as e:
+            raise ValueError(f"target_date must be in YYYY-MM-DD format: {e}")
+    
+    @field_validator('format')
+    @classmethod
+    def validate_format(cls, v: str) -> str:
+        """Validate export format is supported."""
+        if v not in {'csv', 'json'}:
+            raise ValueError("format must be 'csv' or 'json'")
+        return v
+
+
+class ExportSampleRow(BaseModel):
+    """Single row in export data."""
+    
+    timestamp_local: str = Field(description="Local timestamp (ISO format)")
+    year: int = Field(description="Year")
+    doy: int = Field(description="Day of year")
+    lat: float = Field(description="Latitude")
+    lon: float = Field(description="Longitude")
+    t2m_c: float = Field(description="Temperature (°C)")
+    rh2m_pct: float = Field(description="Relative humidity (%)")
+    ws10m_ms: float = Field(description="Wind speed (m/s)")
+    hi_c: Optional[float] = Field(description="Heat index (°C)")
+    wct_c: Optional[float] = Field(description="Wind chill (°C)")
+    precip_mm_per_h: float = Field(description="Precipitation rate (mm/h)")
+    precip_source: str = Field(description="Precipitation data source")
+    flags_very_hot: bool = Field(description="Very hot conditions flag")
+    flags_very_cold: bool = Field(description="Very cold conditions flag")
+    flags_very_windy: bool = Field(description="Very windy conditions flag")
+    flags_very_wet: bool = Field(description="Very wet conditions flag")
+    flags_any_adverse: bool = Field(description="Any adverse conditions flag")
+
+
 class ErrorResponse(BaseModel):
     """Standard error response model."""
     
