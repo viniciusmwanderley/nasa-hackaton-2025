@@ -57,12 +57,41 @@ uv pip install fastapi uvicorn[standard] pydantic httpx python-json-logger pytes
 
 ## Endpoints
 
-- `GET /health` - Health check endpoint
+- `GET /health` - Health check endpoint (rate limited)
+
+## Configuration
+
+The API uses environment variables for configuration. All settings have sensible defaults:
+
+### Weather Thresholds
+- `THRESHOLDS_HI_HOT_C=41.0` - Heat index for "very hot" (°C)
+- `THRESHOLDS_HI_UNCOMF_C=32.0` - Heat index for "uncomfortable" (°C) 
+- `THRESHOLDS_WCT_COLD_C=-10.0` - Wind chill for "very cold" (°C)
+- `THRESHOLDS_WIND_MS=10.8` - Wind speed for "very windy" (m/s)
+- `THRESHOLDS_RAIN_MM_PER_H=4.0` - Precipitation for "very wet" (mm/h)
+
+### CORS & Security
+- `ALLOWED_ORIGINS=http://localhost:5173,http://localhost:4173` - Comma-separated CORS origins
+- `RATE_LIMIT_GENERAL=30/minute;burst=10` - General API rate limit
+- `RATE_LIMIT_EXPORT=6/minute;burst=6` - Export endpoint rate limit
+
+### API Defaults
+- `DEFAULT_BASELINE_START=2001` - Default baseline start year
+- `DEFAULT_WINDOW_DAYS=7` - Default DOY window size
+- `DEFAULT_HOUR_LOCAL=10:00` - Default local hour
+
+### HTTP Client
+- `TIMEOUT_CONNECT_S=10` - Connection timeout (seconds)
+- `TIMEOUT_READ_S=30` - Read timeout (seconds)
+- `RETRIES=3` - Number of HTTP retries
 
 ## Architecture
 
 - **FastAPI** - Modern async web framework
 - **Pydantic v2** - Data validation and serialization  
+- **Pydantic Settings** - Environment variable configuration
 - **Uvicorn** - ASGI server with auto-reload
+- **CORS middleware** - Cross-origin resource sharing
+- **Rate limiting** - SlowAPI for request throttling
 - **Structured JSON logging** - Request tracking with X-Request-ID
 - **Request ID middleware** - Automatic request correlation

@@ -6,8 +6,13 @@ import time
 import logging
 from typing import Callable
 from fastapi import FastAPI, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 from pythonjsonlogger import jsonlogger
+from app.config import Settings
 
 
 class RequestIDMiddleware(BaseHTTPMiddleware):
@@ -70,6 +75,12 @@ def setup_logging():
 # Setup logging
 setup_logging()
 
+# Load configuration
+settings = Settings()
+
+# Create rate limiter
+limiter = Limiter(key_func=get_remote_address)
+
 # Create FastAPI app
 app = FastAPI(
     title="Outdoor Risk API",
@@ -77,13 +88,27 @@ app = FastAPI(
     description="NASA Hackathon 2025 - Estimate odds of adverse weather conditions"
 )
 
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins_list,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Add request ID middleware
 app.add_middleware(RequestIDMiddleware)
 
+# Add rate limiting
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 
 @app.get("/health")
-def health():
-    """Health check endpoint."""
+@limiter.limit(settings.rate_limit_general)
+def health(request: Request):
+    """Health check endpoint with rate limiting."""
     return {
         "status": "ok",
         "version": app.version
