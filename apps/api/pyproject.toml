@@ -17,6 +17,8 @@ dependencies = [
     "httpx>=0.25.0",
     "python-json-logger>=2.0.0",
     "slowapi>=0.1.9",
+    "timezonefinder>=6.4.0",
+    "tzdata>=2023.3",
 ]
 
 [project.scripts]
