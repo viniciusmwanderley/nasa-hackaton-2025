@@ -1,0 +1,71 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - power.larc.nasa.gov
+      user-agent:
+      - outdoor-risk-api/0.1.0 (NASA Hackathon 2025)
+    method: GET
+    uri: https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CRH2M&community=AG&longitude=-38.5275&latitude=-3.7275&start=20230601&end=20230602&format=JSON
+  response:
+    body:
+      string: '{"type":"Feature","geometry":{"type":"Point","coordinates":[-38.528,-3.728,21.44]},"properties":{"parameter":{"T2M":{"20230601":27.79,"20230602":27.6},"RH2M":{"20230601":82.28,"20230602":83.8}}},"header":{"title":"NASA/POWER
+        Source Native Resolution Daily Data","api":{"version":"v2.8.0","name":"POWER
+        Daily API"},"sources":["MERRA2","POWER"],"fill_value":-999.0,"time_standard":"LST","start":"20230601","end":"20230602"},"messages":[],"parameters":{"T2M":{"units":"C","longname":"Temperature
+        at 2 Meters"},"RH2M":{"units":"%","longname":"Relative Humidity at 2 Meters"}},"times":{"data":1.539,"process":0.04}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '610'
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 04 Oct 2025 16:39:19 GMT
+      Via:
+      - 1.1 eeff5278c9ef3f3ed1d2afa9d37222a8.cloudfront.net (CloudFront), 1.1 0978f040ddde360d11673e71f23460b6.cloudfront.net
+        (CloudFront)
+      X-Amz-Cf-Id:
+      - MKQZCZewkfsgRYtXyu0B76MYzu9S-8qjEs05fw47zZUTkMrQMV8Ufg==
+      X-Amz-Cf-Pop:
+      - FOR50-P3
+      - FOR50-P3
+      X-Amzn-Trace-Id:
+      - Root=1-68e14db5-36119f6d79fcab541404574a
+      X-Cache:
+      - Miss from cloudfront
+      content-disposition:
+      - inline; filename=POWER_Point_Daily_20230601_20230602_003d73S_038d53W_LST.json
+      content-language:
+      - en-US
+      x-amz-apigw-id:
+      - R7kUaHhcvHcEHWA=
+      x-amzn-Remapped-content-length:
+      - '610'
+      x-amzn-RequestId:
+      - 278a213a-a0b3-4be0-95c5-de5780a81f61
+      x-app-name:
+      - daily
+      x-app-version:
+      - v2.8.0
+      x-archive-time:
+      - '1.539'
+      x-data-sources:
+      - merra2,power
+      x-objects-time:
+      - '0.059'
+      x-process-time:
+      - '0.04'
+      x-service-time:
+      - '1.64'
+    status:
+      code: 200
+      message: OK
+version: 1

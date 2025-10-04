@@ -1,0 +1,73 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - power.larc.nasa.gov
+      user-agent:
+      - outdoor-risk-api/0.1.0 (NASA Hackathon 2025)
+    method: GET
+    uri: https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CRH2M%2CWS10M%2CPRECTOTCORR&community=AG&longitude=-38.5275&latitude=-3.7275&start=20230601&end=20230607&format=JSON
+  response:
+    body:
+      string: '{"type":"Feature","geometry":{"type":"Point","coordinates":[-38.528,-3.728,21.44]},"properties":{"parameter":{"T2M":{"20230601":27.79,"20230602":27.6,"20230603":27.83,"20230604":27.79,"20230605":27.58,"20230606":27.37,"20230607":27.72},"RH2M":{"20230601":82.28,"20230602":83.8,"20230603":81.15,"20230604":79.37,"20230605":79.15,"20230606":81.25,"20230607":81.98},"WS10M":{"20230601":4.65,"20230602":5.12,"20230603":6.89,"20230604":6.77,"20230605":5.74,"20230606":5.45,"20230607":5.96},"PRECTOTCORR":{"20230601":1.31,"20230602":0.94,"20230603":0.54,"20230604":0.31,"20230605":0.44,"20230606":0.92,"20230607":2.39}}},"header":{"title":"NASA/POWER
+        Source Native Resolution Daily Data","api":{"version":"v2.8.0","name":"POWER
+        Daily API"},"sources":["MERRA2","POWER"],"fill_value":-999.0,"time_standard":"LST","start":"20230601","end":"20230607"},"messages":[],"parameters":{"T2M":{"units":"C","longname":"Temperature
+        at 2 Meters"},"RH2M":{"units":"%","longname":"Relative Humidity at 2 Meters"},"WS10M":{"units":"m/s","longname":"Wind
+        Speed at 10 Meters"},"PRECTOTCORR":{"units":"mm/day","longname":"Precipitation
+        Corrected"}},"times":{"data":0.67,"process":0.03}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1160'
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 04 Oct 2025 16:37:47 GMT
+      Via:
+      - 1.1 247728428c5218c4f8df1419c789d25e.cloudfront.net (CloudFront), 1.1 247728428c5218c4f8df1419c789d25e.cloudfront.net
+        (CloudFront)
+      X-Amz-Cf-Id:
+      - kW5d04vKP8qync0laKQjQl2J3MQ9RECnjOAPbhXDopiYajYLedOT0Q==
+      X-Amz-Cf-Pop:
+      - FOR50-P3
+      - FOR50-P3
+      X-Amzn-Trace-Id:
+      - Root=1-68e14d5a-0bfd981721c7aa630f84dab3
+      X-Cache:
+      - Miss from cloudfront
+      content-disposition:
+      - inline; filename=POWER_Point_Daily_20230601_20230607_003d73S_038d53W_LST.json
+      content-language:
+      - en-US
+      x-amz-apigw-id:
+      - R7kGLGYoPHcETSA=
+      x-amzn-Remapped-content-length:
+      - '1160'
+      x-amzn-RequestId:
+      - ca6e5b61-e62e-481a-bfac-2697337c7f6c
+      x-app-name:
+      - daily
+      x-app-version:
+      - v2.8.0
+      x-archive-time:
+      - '0.67'
+      x-data-sources:
+      - merra2,power
+      x-objects-time:
+      - '0.051'
+      x-process-time:
+      - '0.03'
+      x-service-time:
+      - '0.752'
+    status:
+      code: 200
+      message: OK
+version: 1
