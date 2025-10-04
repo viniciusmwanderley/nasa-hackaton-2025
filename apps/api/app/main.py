@@ -5,7 +5,7 @@ import uuid
 import time
 import logging
 from typing import Callable
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -13,6 +13,15 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from pythonjsonlogger import jsonlogger
 from app.config import Settings
+from app.models import (
+    RiskRequest, RiskResponseLean, RiskResponseFull, ErrorResponse,
+    ConditionProbability, ConfidenceInterval, SampleStatistics, ConditionThresholds
+)
+from app.engine.samples import collect_samples, InsufficientCoverageError
+from app.analysis.probability import calculate_probability
+from app.weather.calculations import heat_index, wind_chill
+from app.weather.thresholds import flag_weather_conditions, WeatherSample
+from app.weather.power import PowerClient
 
 
 class RequestIDMiddleware(BaseHTTPMiddleware):
@@ -113,6 +122,143 @@ def health(request: Request):
         "status": "ok",
         "version": app.version
     }
+
+
+@app.post("/risk", response_model=RiskResponseLean)
+@limiter.limit(settings.rate_limit_general)
+async def assess_risk(request: Request, risk_request: RiskRequest):
+    """
+    Assess outdoor weather risk for a specific location, date, and time.
+    
+    Analyzes historical weather patterns to estimate the probability of
+    dangerous conditions (very hot, very cold, very windy, very wet).
+    
+    Returns probabilities with 95% confidence intervals based on historical
+    data analysis over the specified time window.
+    """
+    try:
+        logger = logging.getLogger("outdoor_risk_api")
+        request_id = getattr(request.state, 'request_id', 'unknown')
+        
+        logger.info(
+            f"Risk assessment requested for ({risk_request.latitude}, {risk_request.longitude}) "
+            f"on {risk_request.target_date} at {risk_request.target_hour}:00 local time",
+            extra={"request_id": request_id}
+        )
+        
+        # Collect historical weather samples
+        try:
+            sample_collection = await collect_samples(
+                latitude=risk_request.latitude,
+                longitude=risk_request.longitude,
+                target_date_str=risk_request.target_date,
+                target_hour=risk_request.target_hour,
+                window_days=risk_request.window_days,
+                settings=settings
+            )
+        except InsufficientCoverageError as e:
+            logger.warning(f"Insufficient coverage: {e}", extra={"request_id": request_id})
+            raise HTTPException(
+                status_code=422,
+                detail=f"Insufficient historical data coverage: {e}"
+            )
+        except ValueError as e:
+            logger.error(f"Invalid request parameters: {e}", extra={"request_id": request_id})
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            logger.error(f"Sample collection failed: {e}", extra={"request_id": request_id})
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to collect weather samples"
+            )
+        
+        # Convert engine WeatherSample to weather WeatherSample for compatibility
+        from app.weather.thresholds import WeatherSample as ThresholdWeatherSample
+        
+        threshold_samples = []
+        for sample in sample_collection.samples:
+            threshold_sample = ThresholdWeatherSample(
+                temperature_c=sample.temperature_c,
+                relative_humidity=sample.relative_humidity,
+                wind_speed_ms=sample.wind_speed_ms,
+                precipitation_mm_per_day=sample.precipitation_mm_per_day,
+                timestamp=sample.timestamp_utc,
+                latitude=sample.latitude,
+                longitude=sample.longitude
+            )
+            threshold_samples.append(threshold_sample)
+        
+        # Calculate probabilities for each condition
+        conditions = ['hot', 'cold', 'windy', 'wet', 'any']
+        probabilities = {}
+        
+        for condition in conditions:
+            try:
+                prob_result = calculate_probability(
+                    samples=threshold_samples,
+                    condition_type=condition,
+                    settings=settings
+                )
+                
+                probabilities[condition] = ConditionProbability(
+                    probability=prob_result.probability,
+                    confidence_interval=ConfidenceInterval(
+                        lower=prob_result.confidence_interval_lower,
+                        upper=prob_result.confidence_interval_upper,
+                        level=prob_result.confidence_level,
+                        width=prob_result.confidence_interval_width
+                    ),
+                    positive_samples=prob_result.positive_samples
+                )
+                
+            except Exception as e:
+                logger.error(f"Probability calculation failed for {condition}: {e}", extra={"request_id": request_id})
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Failed to calculate {condition} probability"
+                )
+        
+        # Build response
+        response = RiskResponseLean(
+            latitude=risk_request.latitude,
+            longitude=risk_request.longitude,
+            target_date=risk_request.target_date,
+            target_hour=risk_request.target_hour,
+            very_hot=probabilities['hot'],
+            very_cold=probabilities['cold'],
+            very_windy=probabilities['windy'],
+            very_wet=probabilities['wet'],
+            any_adverse=probabilities['any'],
+            sample_statistics=SampleStatistics(
+                total_samples=sample_collection.total_samples,
+                years_with_data=sample_collection.years_with_data,
+                coverage_adequate=sample_collection.coverage_adequate,
+                timezone_iana=sample_collection.timezone_iana
+            ),
+            thresholds=ConditionThresholds(
+                very_hot_c=settings.thresholds_hi_hot_c,
+                very_cold_c=settings.thresholds_wct_cold_c,
+                very_windy_ms=settings.thresholds_wind_ms,
+                very_wet_mm_per_h=settings.thresholds_rain_mm_per_h
+            )
+        )
+        
+        logger.info(
+            f"Risk assessment completed: {sample_collection.total_samples} samples analyzed",
+            extra={"request_id": request_id}
+        )
+        
+        return response
+        
+    except HTTPException:
+        # Re-raise HTTP exceptions without wrapping
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error in risk assessment: {e}", extra={"request_id": request_id})
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error during risk assessment"
+        )
 
 
 def run_dev_server():
