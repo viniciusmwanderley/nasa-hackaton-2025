@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     # Coverage requirements
     coverage_min_years: int = Field(default=15, description="Minimum years for coverage")
     coverage_min_samples: int = Field(default=8, description="Minimum samples for coverage")
+    coverage_enforce: bool = Field(default=True, description="Enforce coverage requirements")
     
     # HTTP client timeouts
     timeout_connect_s: int = Field(default=10, description="Connection timeout (seconds)")
@@ -43,6 +44,13 @@ class Settings(BaseSettings):
     
     # External API URLs
     power_base_url: str = Field(default="https://power.larc.nasa.gov", description="NASA POWER API base URL")
+    
+    # IMERG configuration
+    enable_imerg: bool = Field(default=True, description="Enable IMERG precipitation data")
+    enable_precipitation_fallback: bool = Field(default=True, description="Enable POWER fallback for precipitation")
+    imerg_api_key: str = Field(default="", description="IMERG API key (if required)")
+    imerg_product: str = Field(default="early", description="IMERG product type (early/late/final)")
+    imerg_timeout_s: int = Field(default=60, description="IMERG request timeout (seconds)")
     
     # Cache configuration
     cache_dir: str = Field(default="/cache", description="Cache directory path")
@@ -55,6 +63,16 @@ class Settings(BaseSettings):
         if isinstance(self.allowed_origins, str):
             return [origin.strip() for origin in self.allowed_origins.split(',') if origin.strip()]
         return []
+    
+    @property
+    def http_timeout(self) -> int:
+        """Get HTTP timeout in seconds."""
+        return max(self.timeout_connect_s, self.timeout_read_s)
+    
+    @property 
+    def app_version(self) -> str:
+        """Get application version string."""
+        return "1.0.0"
     
     model_config = {
         "env_file": ".env",
