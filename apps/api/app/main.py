@@ -1,5 +1,5 @@
 # ABOUTME: Main FastAPI application with health endpoint and request ID middleware
-# ABOUTME: Provides basic API structure with JSON logging and request tracking
+# ABOUTME: Provides complete outdoor risk assessment API with weather analysis and classification
 
 import uuid
 import time
@@ -8,6 +8,11 @@ from typing import Callable
 from fastapi import FastAPI, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from pythonjsonlogger import jsonlogger
+
+from .controllers.weather_controller import router as weather_router
+from .models.weather import HealthResponse
+from fastapi.responses import JSONResponse
+from datetime import datetime
 
 
 class RequestIDMiddleware(BaseHTTPMiddleware):
@@ -74,20 +79,54 @@ setup_logging()
 app = FastAPI(
     title="Outdoor Risk API",
     version="0.1.0",
-    description="NASA Hackathon 2025 - Estimate odds of adverse weather conditions"
+    description="NASA Hackathon 2025 - Estimate odds of adverse weather conditions for outdoor activities",
+    docs_url="/docs",
+    redoc_url="/redoc"
 )
 
 # Add request ID middleware
 app.add_middleware(RequestIDMiddleware)
 
+# Include routers
+app.include_router(weather_router)
 
-@app.get("/health")
-def health():
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """Global exception handler for all routes."""
+    request_id = getattr(request.state, 'request_id', 'unknown')
+    
+    logger = logging.getLogger("outdoor_risk_api")
+    logger.error(
+        f"Unhandled exception: {str(exc)}",
+        extra={
+            "request_id": request_id,
+            "error_type": type(exc).__name__,
+            "path": request.url.path
+        },
+        exc_info=True
+    )
+    
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "InternalServerError",
+            "message": "An unexpected error occurred while processing your request",
+            "request_id": request_id,
+            "timestamp": datetime.now().isoformat()
+        }
+    )
+
+
+@app.get("/health", response_model=HealthResponse)
+def health(request: Request):
     """Health check endpoint."""
-    return {
-        "status": "ok",
-        "version": app.version
-    }
+    request_id = getattr(request.state, 'request_id', None)
+    return HealthResponse(
+        status="ok",
+        version=app.version,
+        request_id=request_id
+    )
 
 
 def run_dev_server():

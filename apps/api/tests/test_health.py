@@ -25,6 +25,7 @@ class TestHealthEndpoint:
         
         assert "status" in json_data
         assert "version" in json_data
+        assert "request_id" in json_data
         assert json_data["status"] == "ok"
         assert json_data["version"] == "0.1.0"
     
