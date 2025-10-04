@@ -180,7 +180,7 @@ This blueprint translates **spec.md** into a concrete, test-driven, incremental 
 ## 4) LLM Coding Prompts (TDD-first)
 > Use these sequentially. Each prompt: write tests **first**, then minimal code to pass, then refactor if needed.
 
-### Prompt 0 — Monorepo bootstrap
+### Prompt 0 — Monorepo bootstrap - COMPLETE
 ```text
 You are helping build a monorepo with apps/api (FastAPI, Python 3.11) and apps/frontend (React+Vite+TS).
 TASKS:
@@ -191,7 +191,7 @@ TASKS:
 NO CODE RUN YET.
 ```
 
-### Prompt 1 — API skeleton with `/health` and tests
+### Prompt 1 — API skeleton with `/health` and tests - COMPLETE
 ```text
 Goal: Create FastAPI app with /health and JSON logging.
 
@@ -203,7 +203,7 @@ Goal: Create FastAPI app with /health and JSON logging.
 Return file diffs and test results.
 ```
 
-### Prompt 2 — Config module (env) + CORS + rate limiting
+### Prompt 2 — Config module (env) + CORS + rate limiting - COMPLETE
 ```text
 Goal: Config + security baselines.
 
@@ -213,7 +213,7 @@ Goal: Config + security baselines.
 4) Tests: unit test env overrides; functional test that a burst over the limit yields HTTP 429 with Retry-After header.
 ```
 
-### Prompt 3 — Timezone utilities (lat/lon → IANA; local hour)
+### Prompt 3 — Timezone utilities (lat/lon → IANA; local hour) - COMPLETE
 ```text
 Goal: Robust local-time handling.
 
@@ -224,7 +224,7 @@ Goal: Robust local-time handling.
 5) Tests: DST edge cases (pick a zone with DST), Fortaleza (no DST), hour parsing validations.
 ```
 
-### Prompt 4 — POWER client (hourly) with retries + VCR
+### Prompt 4 — POWER client (hourly) with retries + VCR - COMPLETE
 ```text
 Goal: Fetch hourly T2M, RH2M, WS10M, PRECIP in UTC and map to local hour.
 
@@ -234,7 +234,7 @@ Goal: Fetch hourly T2M, RH2M, WS10M, PRECIP in UTC and map to local hour.
 4) Tests: use VCR.py to record a real request for a tiny range; assert columns/rows and that local-hour filter works.
 ```
 
-### Prompt 5 — Heat Index & Wind Chill modules (tested)
+### Prompt 5 — Heat Index & Wind Chill modules (tested) - COMPLETE
 ```text
 Goal: Add metrics with unit-safe implementations.
 
@@ -243,7 +243,7 @@ Goal: Add metrics with unit-safe implementations.
 3) Tests: numeric cases including boundary conditions; verify monotonicity and basic sanity (e.g., HI>=T when RH>0, etc.).
 ```
 
-### Prompt 6 — Threshold helpers
+### Prompt 6 — Threshold helpers - COMPLETE
 ```text
 Goal: Flag conditions per sample at the selected hour.
 
@@ -252,7 +252,7 @@ Goal: Flag conditions per sample at the selected hour.
 2) Tests: truth tables with synthetic arrays.
 ```
 
-### Prompt 7 — Probability engine + Clopper–Pearson
+### Prompt 7 — Probability engine + Clopper–Pearson - COMPLETE
 ```text
 Goal: Compute probabilities with exact 95% CI.
 
@@ -260,7 +260,7 @@ Goal: Compute probabilities with exact 95% CI.
 2) Tests: k=0, k=n, mid k for several n; compare to known values within tolerance.
 ```
 
-### Prompt 8 — Sample collector (POWER only) and integration
+### Prompt 8 — Sample collector (POWER only) and integration - COMPLETE
 ```text
 Goal: Assemble samples over DOY±W at local hour using POWER.
 
@@ -268,7 +268,7 @@ Goal: Assemble samples over DOY±W at local hour using POWER.
 2) Tests: synthetic seasons (mock client) to verify counts and boundaries; ensure coverage gate (>=15 years & >=8 samples) enforced.
 ```
 
-### Prompt 9 — IMERG client + hourly aggregation + fallback
+### Prompt 9 — IMERG client + hourly aggregation + fallback - COMPLETE
 ```text
 Goal: Integrate precipitation from IMERG half-hourly (mm/h) aggregated to the selected local hour; fallback to POWER when both half-hours missing.
 
@@ -277,7 +277,7 @@ Goal: Integrate precipitation from IMERG half-hourly (mm/h) aggregated to the se
 3) Tests: fixtures with half-hour records for cases: (a) both present, (b) one present, (c) both missing -> fallback; assert provenance.
 ```
 
-### Prompt 10 — `/risk` (lean) end-to-end
+### Prompt 10 — `/risk` (lean) end-to-end - COMPLETE
 ```text
 Goal: Wire inputs → sampling → metrics → probabilities; return lean JSON.
 

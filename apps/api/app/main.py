@@ -17,6 +17,8 @@ from app.models import (
     RiskRequest, RiskResponseLean, RiskResponseFull, ErrorResponse,
     ConditionProbability, ConfidenceInterval, SampleStatistics, ConditionThresholds
 )
+from app.analysis.distributions import calculate_distributions
+from app.analysis.trends import calculate_all_trends
 from app.engine.samples import collect_samples, InsufficientCoverageError
 from app.analysis.probability import calculate_probability
 from app.weather.calculations import heat_index, wind_chill
@@ -124,7 +126,7 @@ def health(request: Request):
     }
 
 
-@app.post("/risk", response_model=RiskResponseLean)
+@app.post("/risk")
 @limiter.limit(settings.rate_limit_general)
 async def assess_risk(request: Request, risk_request: RiskRequest):
     """
@@ -135,6 +137,10 @@ async def assess_risk(request: Request, risk_request: RiskRequest):
     
     Returns probabilities with 95% confidence intervals based on historical
     data analysis over the specified time window.
+    
+    Query parameter 'detail' can be 'lean' (default) or 'full':
+    - lean: Returns probabilities and basic statistics only
+    - full: Returns probabilities, distributions, and trend analysis
     """
     try:
         logger = logging.getLogger("outdoor_risk_api")
@@ -218,33 +224,60 @@ async def assess_risk(request: Request, risk_request: RiskRequest):
                     detail=f"Failed to calculate {condition} probability"
                 )
         
-        # Build response
-        response = RiskResponseLean(
-            latitude=risk_request.latitude,
-            longitude=risk_request.longitude,
-            target_date=risk_request.target_date,
-            target_hour=risk_request.target_hour,
-            very_hot=probabilities['hot'],
-            very_cold=probabilities['cold'],
-            very_windy=probabilities['windy'],
-            very_wet=probabilities['wet'],
-            any_adverse=probabilities['any'],
-            sample_statistics=SampleStatistics(
+        # Build base response data
+        base_data = {
+            "latitude": risk_request.latitude,
+            "longitude": risk_request.longitude,
+            "target_date": risk_request.target_date,
+            "target_hour": risk_request.target_hour,
+            "very_hot": probabilities['hot'],
+            "very_cold": probabilities['cold'],
+            "very_windy": probabilities['windy'],
+            "very_wet": probabilities['wet'],
+            "any_adverse": probabilities['any'],
+            "sample_statistics": SampleStatistics(
                 total_samples=sample_collection.total_samples,
                 years_with_data=sample_collection.years_with_data,
                 coverage_adequate=sample_collection.coverage_adequate,
                 timezone_iana=sample_collection.timezone_iana
             ),
-            thresholds=ConditionThresholds(
+            "thresholds": ConditionThresholds(
                 very_hot_c=settings.thresholds_hi_hot_c,
                 very_cold_c=settings.thresholds_wct_cold_c,
                 very_windy_ms=settings.thresholds_wind_ms,
                 very_wet_mm_per_h=settings.thresholds_rain_mm_per_h
             )
-        )
+        }
+        
+        # Check if full detail is requested
+        if risk_request.detail == "full":
+            logger.info("Calculating distributions and trends for full response", extra={"request_id": request_id})
+            
+            try:
+                # Calculate distributions
+                distributions = calculate_distributions(threshold_samples, settings)
+                
+                # Calculate trends
+                trends = calculate_all_trends(threshold_samples, settings)
+                
+                # Build full response
+                response = RiskResponseFull(
+                    **base_data,
+                    distributions=distributions,
+                    trends=trends
+                )
+                
+            except Exception as e:
+                logger.error(f"Failed to calculate distributions/trends: {e}", extra={"request_id": request_id})
+                # Fall back to lean response if full calculations fail
+                response = RiskResponseLean(**base_data)
+        else:
+            # Build lean response
+            response = RiskResponseLean(**base_data)
         
         logger.info(
-            f"Risk assessment completed: {sample_collection.total_samples} samples analyzed",
+            f"Risk assessment completed: {sample_collection.total_samples} samples analyzed, "
+            f"detail={risk_request.detail}",
             extra={"request_id": request_id}
         )
         
