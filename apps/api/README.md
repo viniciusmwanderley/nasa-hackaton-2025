@@ -42,6 +42,34 @@ uv run --with uvicorn uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 uv run python run.py
 ```
 
+### Run integration test
+#### Groelandia (Very cold)
+```bash
+curl -s -X POST "http://localhost:8000/risk"   -H "Content-Type: application/json"   -d '{
+       "latitude": -76.916356,
+       "longitude": 45.327665,
+       "target_date": "2024-06-15",
+       "target_hour": 14,
+       "window_days": 3,
+       "detail": "lean"
+     }' | python -m json.tool
+```
+
+#### Antartica (Very wind)
+```bash
+curl -s -X POST "http://localhost:8000/risk"   -H "Content-Type: application/json"   -d '{
+       "latitude": -66.909701,
+       "longitude": 143.162005,
+       "target_date": "2024-06-15",
+       "target_hour": 14,
+       "window_days": 3,
+       "detail": "lean"
+     }' | python -m json.tool
+```
+
+#### 
+
+
 ### Running Tests
 
 ```bash
