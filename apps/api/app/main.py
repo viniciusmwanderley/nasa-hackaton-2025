@@ -1,13 +1,16 @@
-# ABOUTME: Main FastAPI application with health endpoint and request ID middleware
-# ABOUTME: Provides basic API structure with JSON logging and request tracking
+# ABOUTME: Main FastAPI application with weather analysis endpoints and middleware
+# ABOUTME: Provides complete weather risk assessment API with clean architecture
 
 import uuid
 import time
 import logging
 from typing import Callable
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
+from fastapi.exception_handlers import http_exception_handler
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from pythonjsonlogger import jsonlogger
+from .presentation import weather_router, WeatherAnalysisException
 
 
 class RequestIDMiddleware(BaseHTTPMiddleware):
@@ -73,20 +76,80 @@ setup_logging()
 # Create FastAPI app
 app = FastAPI(
     title="Outdoor Risk API",
-    version="0.1.0",
-    description="NASA Hackathon 2025 - Estimate odds of adverse weather conditions"
+    version="1.0.0",
+    description="NASA Hackathon 2025 - Weather Risk Assessment API using NASA POWER data for outdoor activity planning",
+    docs_url="/docs",
+    redoc_url="/redoc"
 )
 
 # Add request ID middleware
 app.add_middleware(RequestIDMiddleware)
 
+# Include weather analysis routes
+app.include_router(weather_router)
+
+
+# Global exception handler for weather analysis exceptions
+@app.exception_handler(WeatherAnalysisException)
+async def weather_analysis_exception_handler(request: Request, exc: WeatherAnalysisException):
+    """Handle weather analysis specific exceptions."""
+    request_id = getattr(request.state, 'request_id', 'unknown')
+    
+    logger = logging.getLogger("outdoor_risk_api")
+    logger.error(
+        "Weather analysis exception",
+        extra={
+            "request_id": request_id,
+            "error": exc.detail,
+            "status_code": exc.status_code
+        }
+    )
+    
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "success": False,
+            "error": exc.detail,
+            "request_id": request_id
+        }
+    )
+
+
+# Global exception handler
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """Handle all unhandled exceptions."""
+    request_id = getattr(request.state, 'request_id', 'unknown')
+    
+    logger = logging.getLogger("outdoor_risk_api")
+    logger.error(
+        "Unhandled exception",
+        extra={
+            "request_id": request_id,
+            "error": str(exc),
+            "path": request.url.path
+        },
+        exc_info=True
+    )
+    
+    return JSONResponse(
+        status_code=500,
+        content={
+            "success": False,
+            "error": "Internal server error",
+            "request_id": request_id
+        }
+    )
+
 
 @app.get("/health")
 def health():
-    """Health check endpoint."""
+    """Health check endpoint for the main application."""
     return {
         "status": "ok",
-        "version": app.version
+        "service": "outdoor_risk_api",
+        "version": app.version,
+        "description": "Weather Risk Assessment API"
     }
 
 

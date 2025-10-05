@@ -50,6 +50,27 @@ const Dashboard: React.FC = () => {
         const link = document.createElement('a');
         link.href = url;
         link.download = `weather-report-${state.selectedDate}.csv`;
+    };
+
+    const handleExport = () => {
+        const exportData = {
+            location: state.location,
+            selectedDate: state.selectedDate,
+            selectedTime: state.selectedTime,
+            weatherData: state.weatherData,
+            precipitationData: state.precipitationData,
+            forecast: state.forecast
+        };
+        
+        console.log('Exportando dados:', exportData);
+        
+        // TODO: Implementar exportação real (CSV, JSON)
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `weather-data-${state.selectedDate}.json`;
         link.click();
         URL.revokeObjectURL(url);
     };

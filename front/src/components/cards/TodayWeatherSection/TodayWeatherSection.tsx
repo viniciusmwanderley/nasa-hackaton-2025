@@ -8,6 +8,7 @@ const TodayWeatherSection: React.FC = () => {
   const { state, setSelectedDate, setSelectedTime, setLocation } = useApp();
   const { weatherData, location, selectedDate, selectedTime } = state;
 
+  
   // Estados para busca de localização
   const [locationQuery, setLocationQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -40,6 +41,7 @@ const TodayWeatherSection: React.FC = () => {
   const handleLocationSearch = async (query: string) => {
     setLocationQuery(query);
 
+    
     if (!query.trim()) {
       setSearchResults([]);
       setShowDropdown(false);
@@ -49,6 +51,7 @@ const TodayWeatherSection: React.FC = () => {
     setIsSearching(true);
     setShowDropdown(true);
 
+    
     try {
       const results = await geocodeLocation(query);
       setSearchResults(results);
