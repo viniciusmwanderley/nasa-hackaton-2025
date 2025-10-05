@@ -10,7 +10,6 @@ const TodayWeatherSection: React.FC = () => {
   const { weatherData, location, selectedDate, selectedTime } = state;
 
   
-  // Estados para busca de localização
   const [locationQuery, setLocationQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -20,11 +19,11 @@ const TodayWeatherSection: React.FC = () => {
   useEffect(() => {
     if (!selectedDate) {
       const today = new Date().toISOString().split('T')[0];
-      setSelectedDate(today); // A função não retorna Promise no useEffect inicial
+      setSelectedDate(today); 
     }
   }, [selectedDate, setSelectedDate]);
 
-  // Fecha o dropdown quando clicar fora
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -38,7 +37,6 @@ const TodayWeatherSection: React.FC = () => {
     };
   }, []);
 
-  // Busca de localização
   const handleLocationSearch = async (query: string) => {
     setLocationQuery(query);
 
@@ -57,7 +55,7 @@ const TodayWeatherSection: React.FC = () => {
       const results = await geocodeLocation(query);
       setSearchResults(results);
     } catch (error) {
-      console.error('Erro na busca:', error);
+      console.error('Error searching for location:', error);
       setSearchResults([]);
     } finally {
       setIsSearching(false);
@@ -80,7 +78,6 @@ const TodayWeatherSection: React.FC = () => {
   const handleTimeChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
     if (value === '') {
-      // Horário não definido - mostra min/max nas previsões
       await setSelectedTime(null);
     } else {
       const hour = parseInt(value);
@@ -97,7 +94,6 @@ const TodayWeatherSection: React.FC = () => {
     await setSelectedDate(event.target.value);
   };
 
-  // Gera opções de horário (inclui opção para "todos os horários")
   const timeOptions = [
     { hour: undefined, formatted: 'All Day' },
     ...Array.from({ length: 24 }, (_, i) => ({
@@ -106,17 +102,12 @@ const TodayWeatherSection: React.FC = () => {
     }))
   ];
 
-
-
-  // Se não há weatherData e não está carregando, não renderiza nada ou renderiza um estado vazio
   if (!weatherData && !state.isLoading) {
     return null;
   }
 
-  // Acessar os dados da API que são armazenados no contexto
   const { apiData } = state;
   
-  // Dados baseados nos retornos reais da API com tratamento de erro
   const metricsData = [
     {
       imageSrc: '/sun.png',
@@ -168,7 +159,6 @@ const TodayWeatherSection: React.FC = () => {
     }
   ];
 
-  // Se está carregando, mostra skeleton
   if (state.isLoading) {
     return <TodayWeatherSkeleton />;
   }

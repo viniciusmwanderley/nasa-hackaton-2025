@@ -17,12 +17,10 @@ const EnergyPanel: React.FC<EnergyPanelProps> = ({ onBackToDashboard }) => {
     const [error, setError] = useState<string | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-    // Função para resetar o índice da cidade selecionada quando os dados mudam
     const resetCitySelection = () => {
         setSelectedCityIndex('0');
     };
 
-    // Carrega dados de energia para múltiplas cidades
     const loadMultipleLocationsData = async (locations: Location[]) => {
         if (locations.length === 0) {
             setEnergyData([]);
@@ -41,7 +39,7 @@ const EnergyPanel: React.FC<EnergyPanelProps> = ({ onBackToDashboard }) => {
 
             const data = await fetchMultipleEnergyData(locationsWithNames);
             setEnergyData(data);
-            resetCitySelection(); // Reset para primeira cidade quando novos dados chegam
+            resetCitySelection(); 
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Erro ao carregar dados das cidades');
         } finally {
@@ -51,7 +49,6 @@ const EnergyPanel: React.FC<EnergyPanelProps> = ({ onBackToDashboard }) => {
 
     const handleLocationsChange = (locations: Location[]) => {
         setSelectedLocations(locations);
-        // Não carrega dados automaticamente, apenas armazena as localizações
     };
 
     const handleMonthChange = (month: string) => {
@@ -64,7 +61,6 @@ const EnergyPanel: React.FC<EnergyPanelProps> = ({ onBackToDashboard }) => {
 
     return (
         <Box sx={{ backgroundColor: '#f5f7fa', minHeight: '100vh' }}>
-            {/* Componente 1: Header com logo e busca de localizações */}
             <EnergyHeader 
                 onLocationsChange={handleLocationsChange}
                 selectedMonth={selectedMonth}
@@ -74,7 +70,6 @@ const EnergyPanel: React.FC<EnergyPanelProps> = ({ onBackToDashboard }) => {
                 onBackToDashboard={onBackToDashboard}
             />
             
-            {/* Componente 2: Gráficos e Rankings */}
             <EnergyCharts 
                 selectedMonth={selectedMonth} 
                 onMonthChange={handleMonthChange}
@@ -83,7 +78,6 @@ const EnergyPanel: React.FC<EnergyPanelProps> = ({ onBackToDashboard }) => {
                 error={error}
             />
             
-            {/* Componente 3: Informações adicionais */}
             <EnergyInfo 
                 selectedCity={selectedCityIndex} 
                 onCityChange={handleCityChange}

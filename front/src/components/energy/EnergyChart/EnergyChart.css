@@ -29,7 +29,6 @@
     color: #666;
 }
 
-/* Estilização customizada para o Recharts */
 .recharts-cartesian-axis-tick-value {
     font-size: 11px !important;
     fill: #666 !important;
@@ -44,7 +43,6 @@
     opacity: 0.8;
 }
 
-/* Responsividade */
 @media (max-width: 768px) {
     .energy-chart {
         max-width: 100%;

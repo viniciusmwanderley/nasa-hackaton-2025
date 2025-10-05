@@ -55,7 +55,6 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({
         try {
             const locations = await geocodeLocation(query);
             
-            // Filtra locações que já foram selecionadas
             const filteredResults = locations.filter(location => 
                 !selectedLocations.some(selected => 
                     selected.city.toLowerCase() === location.city.toLowerCase() &&
@@ -65,7 +64,7 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({
             
             setSearchResults(filteredResults);
         } catch (error) {
-            console.error('Erro ao buscar localização:', error);
+            console.error('Error searching for locations:', error);
             setSearchResults([]);
         } finally {
             setIsSearching(false);
@@ -111,12 +110,10 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({
         setSearchResults([]);
     };
 
-    // O botão deve estar habilitado se tiver pelo menos 1 localização (1-5)
     const isGenerateEnabled = selectedLocations.length >= 1 && selectedLocations.length <= 5 && !isAnalyzing;
 
     return (
         <div className={styles.container}>
-            {/* Header com logo e botão de voltar */}
             <div className={styles.topHeader}>
                 <div className={styles.logoSection}>
                     <Button
@@ -134,10 +131,8 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({
                 </div>
             </div>
 
-            {/* Card branco principal */}
             <Paper className={styles.whiteCard} elevation={2}>
                 <div className={styles.mainRow}>
-                    {/* Título à esquerda */}
                     <div className={styles.titleSection}>
                         <Typography variant="h4" className={styles.title}>
                             Renewable Opportunities Indicators
@@ -147,10 +142,8 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({
                         </Typography>
                     </div>
                     
-                    {/* Controles à direita */}
                     <div className={styles.controlsSection}>
                         <div className={styles.controlsRow}>
-                            {/* Seleção de mês */}
                             <div className={styles.controlGroup}>
                                 <Select
                                     value={selectedMonth}
@@ -181,7 +174,6 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({
                                 </Select>
                             </div>
                             
-                            {/* Input de cidades */}
                             <div className={styles.controlGroup}>
                                 <ClickAwayListener onClickAway={handleClickAway}>
                                     <div className={styles.citiesInputWrapper}>
@@ -217,7 +209,6 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({
                                             }}
                                         />
 
-                                        {/* Cidades selecionadas */}
                                         {selectedLocations.length > 0 && (
                                             <div className={styles.selectedCitiesContainer}>
                                                 <div className={styles.chipsWrapper}>
@@ -246,7 +237,6 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({
                                             </div>
                                         )}
                                         
-                                        {/* Dropdown de resultados */}
                                         {showDropdown && searchResults.length > 0 && selectedLocations.length < 5 && (
                                             <Paper className={styles.dropdown}>
                                                 {searchResults.map((location, index) => (
@@ -266,7 +256,6 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({
                                 </ClickAwayListener>
                             </div>
                             
-                            {/* Botão de Análise */}
                             <div className={styles.controlGroup}>
                                 <Button
                                     variant="contained"

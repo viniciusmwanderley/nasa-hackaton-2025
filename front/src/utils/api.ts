@@ -5,7 +5,7 @@ import type { EnergyRequest, EnergyResponse, ProcessedCityEnergyData } from '../
 const OPENWEATHER_API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
 const API_BASE_URL = 'https://nasa-hackaton-2025-ten.vercel.app';
 
-// Busca cidade -> coordenadas usando API de geocodificação do OpenWeather
+// Find location details (city, state, country) from a query string
 export const geocodeLocation = async (query: string): Promise<Location[]> => {
   const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=1&appid=${OPENWEATHER_API_KEY}`;
 
@@ -16,7 +16,7 @@ export const geocodeLocation = async (query: string): Promise<Location[]> => {
     const data = await response.json();
 
     if (!Array.isArray(data) || data.length === 0) {
-      console.warn('Nenhum resultado encontrado para:', query);
+      console.warn('No results found for:', query);
       return [];
     }
 
@@ -32,14 +32,13 @@ export const geocodeLocation = async (query: string): Promise<Location[]> => {
     });
     
   } catch (error) {
-    console.error('Erro ao buscar localização:', error);
-    console.error('URL da requisição:', url);
-    console.log('Chave da API OpenWeather:', OPENWEATHER_API_KEY);
+    console.error('Error fetching location:', error);
+    console.error('Request URL:', url);
     return [];
   }
 };
 
-// Função para buscar dados de energia de uma cidade
+// Function for fecthing climate energy data 
 export const fetchEnergyData = async (latitude: number, longitude: number): Promise<EnergyResponse | null> => {
   const url = `${API_BASE_URL}/climate-energy/analyze`;
   
@@ -67,7 +66,7 @@ export const fetchEnergyData = async (latitude: number, longitude: number): Prom
   }
 };
 
-// Função para buscar dados de energia de múltiplas cidades
+// Climate date for multiple cities
 export const fetchMultipleEnergyData = async (locations: Array<{latitude: number, longitude: number, cityName: string}>): Promise<ProcessedCityEnergyData[]> => {
   try {
     const promises = locations.map(async (location) => {
@@ -85,7 +84,6 @@ export const fetchMultipleEnergyData = async (locations: Array<{latitude: number
   }
 };
 
-// Função para processar dados da API em formato utilizável pelos componentes
 export const processEnergyData = (data: EnergyResponse, cityName: string): ProcessedCityEnergyData => {
   const { climate_energy_potential, raw_nasa_metrics_monthly, location } = data;
 
@@ -105,7 +103,6 @@ export const processEnergyData = (data: EnergyResponse, cityName: string): Proce
   };
 };
 
-// Mapeamento de nomes de meses
 export const MONTH_NAMES = {
   JAN: 'Janeiro',
   FEB: 'Fevereiro', 
@@ -121,7 +118,6 @@ export const MONTH_NAMES = {
   DEC: 'Dezembro'
 } as const;
 
-// Coordenadas das principais cidades brasileiras
 export const CITY_COORDINATES = {
   'fortaleza': { latitude: -3.7319, longitude: -38.5267, name: 'Fortaleza' },
   'salvador': { latitude: -12.9714, longitude: -38.5014, name: 'Salvador' },

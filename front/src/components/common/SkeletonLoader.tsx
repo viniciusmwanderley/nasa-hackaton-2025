@@ -29,32 +29,26 @@ const Skeleton: React.FC<SkeletonProps> = ({
   />
 );
 
-// Skeleton para TodayWeatherSection
 export const TodayWeatherSkeleton: React.FC = () => (
   <div className="today-weather" style={{ padding: '32px', backgroundColor: 'white', borderRadius: '16px', minHeight: '300px' }}>
-    {/* Título */}
     <div style={{ marginBottom: '24px' }}>
       <Skeleton width="180px" height="28px" borderRadius="8px" />
     </div>
     
-    {/* Campo de busca */}
     <div style={{ marginBottom: '32px' }}>
       <Skeleton width="100%" height="48px" borderRadius="12px" />
     </div>
     
-    {/* Informações principais */}
     <div style={{ marginBottom: '24px' }}>
       <Skeleton width="250px" height="24px" borderRadius="6px" style={{ marginBottom: '12px' }} />
       <Skeleton width="300px" height="20px" borderRadius="6px" />
     </div>
     
-    {/* Temperatura e outros dados */}
     <div style={{ display: 'flex', gap: '24px', marginBottom: '16px' }}>
       <Skeleton width="120px" height="32px" borderRadius="8px" />
       <Skeleton width="180px" height="20px" borderRadius="6px" />
     </div>
     
-    {/* Localização */}
     <div>
       <Skeleton width="200px" height="20px" borderRadius="6px" />
     </div>
@@ -70,7 +64,6 @@ export const TodayWeatherSkeleton: React.FC = () => (
   </div>
 );
 
-// Skeleton para DailyForecast
 export const DailyForecastSkeleton: React.FC = () => (
   <div className="daily-forecast-card">
     <div className="forecast-container">
@@ -93,7 +86,6 @@ export const DailyForecastSkeleton: React.FC = () => (
   </div>
 );
 
-// Skeleton para PrecipitationChart
 export const PrecipitationChartSkeleton: React.FC = () => (
   <div className="precipitation-card">
     <div className="card-header">
@@ -120,7 +112,6 @@ export const PrecipitationChartSkeleton: React.FC = () => (
   </div>
 );
 
-// Skeleton para MapCard
 export const MapCardSkeleton: React.FC = () => (
   <div className="map-card">
     <div className="card-header map-header">
@@ -143,7 +134,6 @@ export const MapCardSkeleton: React.FC = () => (
   </div>
 );
 
-// Skeleton para WeatherCard
 export const WeatherCardSkeleton: React.FC = () => (
   <div className="weather-card" style={{ padding: '24px', backgroundColor: 'white', borderRadius: '12px' }}>
     <div className="weather-text-content">

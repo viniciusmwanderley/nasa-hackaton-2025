@@ -3,7 +3,6 @@ import './WeatherCard.css';
 import { useApp } from '../../../contexts/AppContext';
 import { WeatherCardSkeleton } from '../../common/SkeletonLoader';
 
-// Função para obter emoji baseado na condição
 const getWeatherEmoji = (condition: string) => {
   switch (condition) {
     case 'hot':
@@ -19,17 +18,16 @@ const getWeatherEmoji = (condition: string) => {
   }
 };
 
-// Função para obter imagem baseada na condição
 const getWeatherImage = (condition: string) => {
   switch (condition) {
     case 'hot':
       return '/renewable.png';
     case 'cold':
-      return '/soando.png'; // TODO: adicionar imagem para frio
+      return '/soando.png'; 
     case 'windy':
-      return '/soando.png'; // TODO: adicionar imagem para vento
+      return '/soando.png'; 
     case 'wet':
-      return '/soando.png'; // TODO: adicionar imagem para chuva
+      return '/soando.png'; 
     default:
       return '/soando.png';
   }
@@ -39,24 +37,20 @@ const WeatherCard: React.FC = () => {
     const { state } = useApp();
     const { weatherData, location, isLoading } = state;
 
-    // Se está carregando, mostra skeleton
     if (isLoading) {
         return <WeatherCardSkeleton />;
     }
 
-    // Se não há dados meteorológicos e não está carregando, não renderiza
     if (!weatherData && !isLoading) {
         return null;
     }
 
-    // Se não há weatherData mas não está em loading, não renderiza o conteúdo
     if (!weatherData) {
         return null;
     }
 
     return (
         <div className="weather-card">
-            {/* Componente 1: TODO o conteúdo de texto */}
             <div className="weather-text-content">
                 <h2 className="weather-title">Clima Hoje</h2>
                 <p className="weather-subtitle">
@@ -79,7 +73,6 @@ const WeatherCard: React.FC = () => {
 
             </div>
             
-            {/* Componente 2: Apenas a imagem */}
             <div className="weather-illustration">
                 <img 
                     src={getWeatherImage(weatherData.condition)}

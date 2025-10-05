@@ -153,7 +153,6 @@
     font-weight: 500;
 }
 
-/* Responsividade */
 @media (max-width: 768px) {
     .daily-forecast-card {
         padding: 14px;

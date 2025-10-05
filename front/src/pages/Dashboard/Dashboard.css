@@ -15,7 +15,6 @@ body {
   min-height: 100vh;
   background: #F5F5F5;
   padding: 0;
-  /* NOVO: Adicione um padding lateral para telas muito largas */
   padding: 0 40px; 
 }
 
@@ -24,13 +23,10 @@ body {
   grid-template-columns: 2fr 1fr;
   gap: 24px;
   
-  /* CORREÇÃO: Removemos o padding desnecessário do .main-content */
-  padding: 18px 0; 
+=  padding: 18px 0; 
 
   min-height: calc(100vh - 180px);
-  /* Aumentei o max-width para dar mais espaço geral */
   max-width: 1400px; 
-  /* Garante que o conteúdo esteja centralizado dentro do padding do pai */
   margin: 0 auto; 
   align-items: start;
 }
@@ -48,7 +44,6 @@ body {
   min-width: 350px;
 }
 
-/* Layout das 3 linhas na esquerda */
 .weather-row,
 .forecast-row {
   width: 100%;
@@ -63,7 +58,6 @@ body {
   align-items: stretch;
 }
 
-/* Container da sidebar direita com fundo claro */
 .sidebar-container {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
@@ -105,9 +99,8 @@ body {
 }
 
 /* Responsive Design */
-@media (max-width: 1440px) { /* Ajustei o breakpoint para acompanhar o novo max-width */
+@media (max-width: 1440px) {
     .dashboard-container {
-        /* Remove o padding lateral em telas que não são muito grandes, deixando o padding da media query abaixo atuar */
         padding: 0;
     }
 }
@@ -116,7 +109,6 @@ body {
 @media (max-width: 1024px) {
   .main-content {
     grid-template-columns: 1fr;
-    /* NOVO: Adiciona o padding responsivo aqui */
     padding: 15px 30px; 
   }
   
@@ -163,7 +155,6 @@ body {
   }
 }
 
-/* Loading e Error overlays */
 .loading-overlay,
 .error-overlay {
     position: fixed;

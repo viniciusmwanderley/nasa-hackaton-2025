@@ -4,7 +4,7 @@ import type { AppState, AppConfig, Location, WeatherData, DayForecast, Precipita
 import type { RiskResponseLean, WeatherAnalyzeResponse } from '../types/api';
 import { getTimezoneFromLocationSync } from '../utils/timezone';
 
-// Ações do reducer
+// Reducer actions
 type AppAction =
   | { type: 'SET_LOCATION'; payload: Location }
   | { type: 'SET_SELECTED_DATE'; payload: string }
@@ -19,7 +19,7 @@ type AppAction =
   | { type: 'UPDATE_FROM_WEATHER_API'; payload: WeatherAnalyzeResponse }
   | { type: 'RESET_STATE' };
 
-// Estado inicial
+// Initial state
 const getCurrentDate = () => {
   const today = new Date();
   return today.toISOString().split('T')[0];
@@ -37,7 +37,7 @@ const initialState: AppState = {
   },
   selectedDate: getCurrentDate(),
   selectedTime: null,
-  weatherData: null, // Inicia sem dados
+  weatherData: null, 
   forecast: [],
   precipitationData: [],
   calendar: {
@@ -46,12 +46,12 @@ const initialState: AppState = {
     selectedDate: getCurrentDate(),
     availableDates: []
   },
-  isLoading: true, // Inicia em loading
+  isLoading: true, 
   error: null,
   apiData: null
 };
 
-// Configuração padrão
+// Default configuration
 const defaultConfig: AppConfig = {
   windowDays: 7,
   baselineStart: 2001,
@@ -98,8 +98,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, error: action.payload, isLoading: false };
     
     case 'UPDATE_FROM_API':
-      // Atualiza o estado com dados da API
-      const apiData = action.payload;
+      { const apiData = action.payload;
       return {
         ...state,
         location: {
@@ -109,7 +108,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
         },
         weatherData: {
           ...state.weatherData!,
-          temperature: Math.round(Math.random() * 15 + 20), // Temporário até integrar com dados reais
+          temperature: Math.round(Math.random() * 15 + 20), 
           condition: apiData.very_hot.probability > 0.5 ? 'hot' : 
                     apiData.very_cold.probability > 0.5 ? 'cold' :
                     apiData.very_windy.probability > 0.5 ? 'windy' :
@@ -117,57 +116,36 @@ function appReducer(state: AppState, action: AppAction): AppState {
         },
         isLoading: false,
         error: null
-      };
+      }; }
 
     case 'UPDATE_FROM_WEATHER_API':
       try {
-        // Processa dados da API /weather/analyze/
         const weatherData = action.payload;
         
         if (!weatherData || !weatherData.results || !Array.isArray(weatherData.results)) {
-          console.error('Dados da API inválidos:', weatherData);
+          console.error('Invalid API data:', weatherData);
           return {
             ...state,
-            error: 'Dados inválidos recebidos da API',
+            error: 'Invalid API data received',
             isLoading: false
           };
         }
       
-      // Encontra o resultado para o dia selecionado
-      console.log('Procurando dados para a data:', state.selectedDate);
-      console.log('Datas disponíveis:', weatherData.results.map(r => r.datetime.split('T')[0]));
-      
       const selectedDateResult = weatherData.results.find(result => 
         result.datetime.split('T')[0] === state.selectedDate
-      ) || weatherData.results[Math.floor(weatherData.results.length / 2)]; // Fallback para o meio da lista
+      ) || weatherData.results[Math.floor(weatherData.results.length / 2)]; 
       
-      console.log('Dados selecionados para o dia:', selectedDateResult);
-
-      // Mapeia condição baseada nas classificações
+      
       let condition: 'hot' | 'cold' | 'windy' | 'wet' | 'normal' = 'normal';
       const classifications = weatherData.classifications;
-      
-      console.log('=== PROCESSANDO CLASSIFICAÇÕES ===');
-      console.log('Percentil de calor:', classifications.very_hot_temp_percentile);
-      console.log('Percentil de vento:', classifications.very_windy_percentile);
-      console.log('Probabilidade de chuva forte:', classifications.very_wet_probability);
-      console.log('Probabilidade de chuva geral:', classifications.rain_probability);
-      
+            
       if (classifications.very_hot_temp_percentile > 60) condition = 'hot';
       else if (classifications.very_windy_percentile > 65) condition = 'windy';
       else if (classifications.very_wet_probability > 0.15 || classifications.rain_probability > 0.4) condition = 'wet';
 
-      // Atualiza weather data com dados reais
       const temperature = Math.round(selectedDateResult.parameters.T2M.value);
       const rainChance = Math.round(classifications.rain_probability * 100);
-      const humidity = Math.round(selectedDateResult.parameters.RH2M.value);
-      
-      console.log('=== DADOS PROCESSADOS ===');
-      console.log('Temperatura:', temperature + '°C');
-      console.log('Chance de chuva:', rainChance + '%');
-      console.log('Umidade:', humidity + '%');
-      console.log('Condição:', condition);
-      
+            
       const updatedWeatherData: WeatherData = {
         temperature,
         description: condition === 'hot' ? `Temperatura de ${temperature}°C! Procure abrigo fresco, use roupas claras e beba água.` :
@@ -180,22 +158,12 @@ function appReducer(state: AppState, action: AppAction): AppState {
         condition
       };
 
-      // Gera forecast com dados reais baseado na granularidade
       const isHourlyData = weatherData.meta.granularity === 'hourly';
-      console.log('Tipo de dados:', isHourlyData ? 'Horário específico' : 'Diário (min/max)');
-      console.log('Quantidade de resultados recebidos:', weatherData.results.length);
-      
+
       const forecast: DayForecast[] = weatherData.results.slice(0, 7).map((result, index) => {
         try {
           const date = result.datetime.split('T')[0];
           const dayNames = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
-          
-          console.log(`Processando resultado ${index + 1}:`, {
-            datetime: result.datetime,
-            T2M: result.parameters?.T2M?.value,
-            T2M_MIN: result.parameters?.T2M_MIN?.value,
-            T2M_MAX: result.parameters?.T2M_MAX?.value
-          });
           
           const baseData = {
             dayInitial: dayNames[index % 7],
@@ -206,31 +174,24 @@ function appReducer(state: AppState, action: AppAction): AppState {
           } as DayForecast;
 
           if (isHourlyData) {
-            // Para dados horários, usa temperatura única
             if (result.parameters?.T2M?.value !== undefined) {
               baseData.temperature = Math.round(result.parameters.T2M.value);
-              console.log(`Dia ${index + 1}: ${baseData.temperature}°C (horário específico)`);
             } else {
-              console.error(`Temperatura T2M não encontrada para o dia ${index + 1}`);
-              baseData.temperature = 0; // Fallback
+              baseData.temperature = 0; 
             }
           } else {
-            // Para dados diários, usa min/max
             if (result.parameters?.T2M_MIN?.value !== undefined && result.parameters?.T2M_MAX?.value !== undefined) {
               baseData.minTemperature = Math.round(result.parameters.T2M_MIN.value);
               baseData.maxTemperature = Math.round(result.parameters.T2M_MAX.value);
-              console.log(`Dia ${index + 1}: ${baseData.minTemperature}°C - ${baseData.maxTemperature}°C (min/max)`);
             } else {
-              console.error(`Temperaturas min/max não encontradas para o dia ${index + 1}`);
-              baseData.minTemperature = 0; // Fallback
-              baseData.maxTemperature = 0; // Fallback
+              baseData.minTemperature = 0; 
+              baseData.maxTemperature = 0;
             }
           }
 
           return baseData;
         } catch (error) {
-          console.error(`Erro ao processar resultado ${index + 1}:`, error);
-          // Retorna dados padrão em caso de erro
+          console.error(`Error processing result ${index + 1}:`, error);
           return {
             dayInitial: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'][index % 7],
             date: new Date().toISOString().split('T')[0],
@@ -242,7 +203,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
         }
       });
 
-      // Gera dados de precipitação
+      
       const precipitationData: PrecipitationData[] = weatherData.results.map(result => ({
         date: result.datetime.split('T')[0],
         value: result.parameters.PRECTOTCORR.value
@@ -262,10 +223,10 @@ function appReducer(state: AppState, action: AppAction): AppState {
           error: null
         };
       } catch (error) {
-        console.error('Erro ao processar dados da API:', error);
+        console.error('Error processing weather data:', error);
         return {
           ...state,
-          error: 'Erro ao processar dados meteorológicos',
+          error: 'Error processing weather data',
           isLoading: false
         };
       }
@@ -278,12 +239,10 @@ function appReducer(state: AppState, action: AppAction): AppState {
   }
 }
 
-// Context
 interface AppContextType {
   state: AppState;
   config: AppConfig;
   dispatch: React.Dispatch<AppAction>;
-  // Ações auxiliares
   setLocation: (location: Location) => Promise<void>;
   setSelectedDate: (date: string) => Promise<void>;
   setSelectedTime: (time: TimeSelection | null) => Promise<void>;
@@ -301,19 +260,14 @@ interface AppProviderProps {
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
-  // Carrega dados iniciais quando a aplicação inicia
   React.useEffect(() => {
-    console.log('🚀 Iniciando aplicação - Carregando dados para João Pessoa...');
     callWeatherAnalyzeAPI(initialState.location, initialState.selectedDate, initialState.selectedTime);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Função para chamar a API weather/analyze
-  const callWeatherAnalyzeAPI = async (location: Location, selectedDate: string, selectedTime: TimeSelection | null) => {
-    console.log('🌤️ Buscando dados da API para:', location.city);
-    
+  const callWeatherAnalyzeAPI = async (location: Location, selectedDate: string, selectedTime: TimeSelection | null) => {    
     const timezone = getTimezoneFromLocationSync(location);
     
-    // Formatar center_datetime
+    // Formatting center_datetime
     const centerDatetime = selectedTime
       ? `${selectedDate}T${selectedTime.formatted}:00Z`
       : `${selectedDate}T00:00:00Z`;
@@ -347,41 +301,35 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       }
 
       const data: WeatherAnalyzeResponse = await response.json();
-      console.log('✅ Dados recebidos da API com sucesso');
-      
-      // Processa e atualiza os dados
+
+      // Process and update the data
       dispatch({ type: 'UPDATE_FROM_WEATHER_API', payload: data });
       dispatch({ type: 'SET_LOADING', payload: false });
 
     } catch (error) {
-      console.error('❌ Erro na API:', error);
+      console.error('API Error:', error);
       dispatch({ type: 'SET_LOADING', payload: false });
-      dispatch({ type: 'SET_ERROR', payload: 'Erro ao carregar dados. Tente novamente.' });
+      dispatch({ type: 'SET_ERROR', payload: 'Error loading data. Please try again.' });
     }
   };
 
-  // Ações auxiliares
+  // Auxiliary actions
   const setLocation = async (location: Location) => {
-    console.log('🚀 Mudando localização para:', location.city);
-    
+  
     dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'SET_LOCATION', payload: location });
     
     await callWeatherAnalyzeAPI(location, state.selectedDate, state.selectedTime);
   };
 
-  const setSelectedDate = async (date: string) => {
-    console.log('📅 Mudando data para:', date);
-    
+  const setSelectedDate = async (date: string) => {    
     dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'SET_SELECTED_DATE', payload: date });
     
     await callWeatherAnalyzeAPI(state.location, date, state.selectedTime);
   };
 
-  const setSelectedTime = async (time: TimeSelection | null) => {
-    console.log('⏰ Mudando horário para:', time?.formatted || 'All Day');
-    
+  const setSelectedTime = async (time: TimeSelection | null) => {    
     dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'SET_SELECTED_TIME', payload: time });
     
@@ -402,16 +350,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     dispatch({ type: 'SET_ERROR', payload: null });
 
     try {
-      // TODO: Implementar chamada real para a API quando estiver pronta
-      // Por enquanto, simula uma requisição
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Dados simulados baseados na estrutura da API
       const mockApiResponse: RiskResponseLean = {
         latitude: state.location.latitude,
         longitude: state.location.longitude,
         target_date: state.selectedDate,
-        target_hour: state.selectedTime?.hour ?? 12, // Usa 12h como padrão quando não definido
+        target_hour: state.selectedTime?.hour ?? 12, 
         very_hot: {
           probability: Math.random(),
           confidence_interval: {
@@ -500,7 +445,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   );
 };
 
-// Hook customizado
+// Custom hook
+// eslint-disable-next-line react-refresh/only-export-components
 export const useApp = () => {
   const context = useContext(AppContext);
   if (context === undefined) {

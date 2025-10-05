@@ -1,10 +1,8 @@
-/* Estilos gerais do container */
 .container {
     padding: 24px !important;
     background-color: #f4f6f8;
 }
 
-/* Layout principal com duas colunas */
 .mainLayout {
     display: flex;
     gap: 24px;
@@ -28,7 +26,6 @@
     height: 500px;
 }
 
-/* Cabeçalho com título e seletor de cidade */
 .headerTab {
     background-color: white;
     border-radius: 12px;
@@ -45,7 +42,6 @@
     font-size: 24px !important;
 }
 
-/* ===== ESTILOS MELHORADOS DO SELETOR DE CIDADE ===== */
 .citySelector {
     min-width: 280px;
 }
@@ -91,7 +87,6 @@
     font-size: 20px !important;
 }
 
-/* Texto "Waiting For Cities" */
 .waitingText {
     color: #666 !important;
     font-style: italic !important;
@@ -99,7 +94,6 @@
     font-weight: 500 !important;
 }
 
-/* Dropdown estilizado */
 .cityDropdownPaper {
     border-radius: 8px !important;
     margin-top: 8px !important;
@@ -133,7 +127,6 @@
     background-color: #bbdefb !important;
 }
 
-/* Mensagem de espera no dropdown */
 .waitingMenuItem {
     opacity: 0.7 !important;
     cursor: not-allowed !important;
@@ -147,7 +140,6 @@
     font-size: 13px !important;
 }
 
-/* Estado quando não há cidades */
 .citySelect:disabled {
     background-color: #f9f9f9 !important;
 }
@@ -161,9 +153,6 @@
     color: #ccc !important;
 }
 
-/* ===== FIM DOS ESTILOS DO SELETOR ===== */
-
-/* Layout para os indicadores em linha */
 .indicatorsRowContainer {
     display: flex;
     gap: 20px;
@@ -200,7 +189,6 @@
     align-items: stretch;
 }
 
-/* Estilo do Card de Indicador */
 .indicatorCard {
     flex: 1;
     border-radius: 16px !important;
@@ -252,7 +240,6 @@
     font-weight: 600 !important;
 }
 
-/* Vetor de fundo ondulado */
 .cardBackgroundVector {
     position: absolute;
     bottom: 0;
@@ -265,7 +252,6 @@
     z-index: 1;
 }
 
-/* Estilos da seção de informações (Direita) */
 .infoCard {
     border-radius: 16px !important;
     border: none !important;
@@ -276,7 +262,6 @@
     flex-direction: column !important;
 }
 
-/* Card Solar: fundo amarelo, textos escuros */
 .solarInfoCard {
     background-color: #F9DA5F !important;
 }
@@ -289,7 +274,6 @@
     color: #4F4F4F !important;
 }
 
-/* Card Eólico: fundo azul escuro, textos brancos */
 .windInfoCard {
     background-color: #1A3B7E !important;
 }
@@ -299,7 +283,6 @@
     color: #FFFFFF !important;
 }
 
-/* Estilos de fonte para os títulos e descrições dos cards de info */
 .infoCardTitle {
     font-weight: 700 !important;
     font-size: 18px !important;
@@ -313,7 +296,6 @@
     line-height: 1.6 !important;
 }
 
-/* Responsividade */
 @media (max-width: 1200px) {
     .mainLayout {
         flex-direction: column;

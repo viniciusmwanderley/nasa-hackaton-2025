@@ -6,7 +6,7 @@ interface MetricCardProps {
   value: string;
   label: string;
   variant: 'temperature' | 'extreme-heat' | 'wind' | 'humidity' | 'fog' | 'rain' | 'storm' | 'snow';
-  className?: string; // Permitir classes personalizadas
+  className?: string; 
 }
 
 const MetricsCard: React.FC<MetricCardProps> = ({ imageSrc, value, label, variant, className }) => {

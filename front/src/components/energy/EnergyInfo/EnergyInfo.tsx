@@ -27,7 +27,6 @@ const EnergyInfo: React.FC<EnergyInfoProps> = ({
     error = null,
     availableCities = []
 }) => {
-    // Obtém dados da cidade selecionada
     const getCurrentCityData = () => {
         if (!selectedCity || !availableCities.length) return null;
         const cityIndex = parseInt(selectedCity, 10);
@@ -36,10 +35,8 @@ const EnergyInfo: React.FC<EnergyInfoProps> = ({
 
     const currentCityData = getCurrentCityData();
 
-    // Função para obter dados dos indicadores a partir da API
     const getLocalIndicators = () => {
         if (!currentCityData) {
-            // Dados de fallback quando não há dados da API
             return [
                 {
                     title: 'Angle for Maximum Irradiation',
@@ -122,11 +119,9 @@ const EnergyInfo: React.FC<EnergyInfoProps> = ({
 
     const localIndicators = getLocalIndicators();
 
-    // Separa os indicadores por grupo para o novo layout
     const solarIndicators = localIndicators.filter(ind => ind.group === 'solar');
     const windIndicators = localIndicators.filter(ind => ind.group === 'wind');
     
-    // Gera lista de cidades disponíveis a partir dos dados carregados
     const cities = availableCities.map((city, index) => ({
         value: index.toString(),
         label: city.cityName,
@@ -175,7 +170,6 @@ const EnergyInfo: React.FC<EnergyInfoProps> = ({
                 </Alert>
             )}
             <Box className={styles.mainLayout}>
-                {/* Seção Esquerda (Indicadores) */}
                 <Box className={styles.leftSection}>
                     <Box className={styles.headerTab}>
                         <Typography variant="h5" className={styles.title}>
@@ -236,9 +230,7 @@ const EnergyInfo: React.FC<EnergyInfoProps> = ({
                         </FormControl>
                     </Box>
 
-                    {/* Container principal para os grupos de indicadores */}
                     <Box className={styles.indicatorsRowContainer}>
-                        {/* Grupo Solar */}
                         <Box className={styles.indicatorGroup}>
                             <Box className={styles.nasaLabel}>
                                 <Typography className={styles.nasaLabelText}>
@@ -250,7 +242,6 @@ const EnergyInfo: React.FC<EnergyInfoProps> = ({
                             </Box>
                         </Box>
                         
-                        {/* Grupo Eólico */}
                         <Box className={styles.indicatorGroup}>
                             <Box className={styles.nasaLabel}>
                                 <Typography className={styles.nasaLabelText}>
@@ -264,7 +255,6 @@ const EnergyInfo: React.FC<EnergyInfoProps> = ({
                     </Box>
                 </Box>
 
-                {/* Seção Direita (Informações) */}
                 <Box className={styles.rightSection}>
                     <Card className={`${styles.infoCard} ${styles.solarInfoCard}`}>
                         <CardContent>

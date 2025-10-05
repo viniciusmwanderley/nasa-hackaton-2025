@@ -1,5 +1,3 @@
-// Tipos baseados na API do backend para integração futura
-
 export interface ConfidenceInterval {
   lower: number;
   upper: number;
@@ -27,7 +25,6 @@ export interface ConditionThresholds {
   very_wet_mm_per_day: number;
 }
 
-// Resposta principal da API /risk
 export interface RiskResponseLean {
   latitude: number;
   longitude: number;
@@ -42,7 +39,6 @@ export interface RiskResponseLean {
   thresholds: ConditionThresholds;
 }
 
-// Request para a API
 export interface RiskRequest {
   lat: number;
   lon: number;
@@ -50,7 +46,6 @@ export interface RiskRequest {
   hour_local: string; // HH:00
 }
 
-// Tipos para API /weather/analyze/
 export interface WeatherParameter {
   value: number;
   mode: string;
@@ -98,7 +93,6 @@ export interface WeatherClassifications {
   very_wet_wind_threshold: number;
 }
 
-// Tipos para a API de energia
 export interface MonthlyEnergyData {
   JAN: number;
   FEB: number;
@@ -144,7 +138,6 @@ export interface EnergyRequest {
   longitude: number;
 }
 
-// Tipos processados para usar nos componentes
 export interface ProcessedCityEnergyData {
   cityName: string;
   location: EnergyLocation;

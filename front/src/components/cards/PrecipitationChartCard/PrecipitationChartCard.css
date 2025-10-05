@@ -60,7 +60,6 @@
     margin-left: 8px;
 }
 
-/* ---------- CONTROLES (mês e setas) ---------- */
 .chart-controls {
     display: flex;
     justify-content: center;
@@ -89,20 +88,16 @@
     font-size: 16px;
 }
 
-/* ---------- ÁREA DO GRÁFICO ---------- */
 .chart-area {
     display: flex;
     height: 180px;
     position: relative;
     padding-left: 40px;
     overflow: visible;
-    padding-bottom: 30px; /* espaço suficiente para labels X */
+    padding-bottom: 30px; 
     border-left: 1px solid #e0e0e0;
 }
 
-/* Removendo a linha de base para reposicionar corretamente */
-
-/* ---------- EIXO Y ---------- */
 .y-axis {
     display: flex;
     flex-direction: column;
@@ -127,16 +122,13 @@
 }
 
 .y-axis-tick:first-child {
-    /* 100 no topo */
     transform: translateY(-50%);
 }
 
 .y-axis-tick:last-child {
-    /* 0 exatamente na base das barras - sem offset */
     transform: translateY(0);
 }
 
-/* ---------- BARRAS ---------- */
 .chart-bars {
     display: flex;
     align-items: flex-end;
@@ -205,7 +197,6 @@
     white-space: nowrap;
 }
 
-/* ---------- RESPONSIVIDADE ---------- */
 @media (max-width: 768px) {
     .precipitation-card {
         padding: 12px;
@@ -229,5 +220,4 @@
         width: 10px;
     }
 }
-/* Add missing closing bracket for media query */
 }

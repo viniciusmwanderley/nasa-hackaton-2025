@@ -27,7 +27,6 @@ const EnergyCharts: React.FC<EnergyChartsProps> = ({
     error = null,
     selectedMonth = '01'
 }) => {
-    // Mapeamento mês número para chave da API
     const monthKeys = {
         '01': 'JAN', '02': 'FEB', '03': 'MAR', '04': 'APR',
         '05': 'MAY', '06': 'JUN', '07': 'JUL', '08': 'AUG',
@@ -38,7 +37,6 @@ const EnergyCharts: React.FC<EnergyChartsProps> = ({
     const currentMonthKey = monthKeys[selectedMonth as keyof typeof monthKeys] || 'ANN';
     const isAnnual = currentMonthKey === 'ANN';
 
-    // Função para gerar nome curto da cidade
     const generateShortName = (cityName: string): string => {
         const parts = cityName.split(',')[0].trim();
         const words = parts.split(' ');
@@ -49,7 +47,6 @@ const EnergyCharts: React.FC<EnergyChartsProps> = ({
         }
     };
 
-    // Processa dados solares para o gráfico
     const solarData = energyData.length > 0 ? energyData.map(city => ({
         city: city.cityName,
         shortName: generateShortName(city.cityName),
@@ -58,7 +55,6 @@ const EnergyCharts: React.FC<EnergyChartsProps> = ({
             Math.round(city.solarMonthly[currentMonthKey])
     })) : [];
 
-    // Processa dados eólicos para o gráfico
     const windData = energyData.length > 0 ? energyData.map(city => ({
         city: city.cityName,
         shortName: generateShortName(city.cityName),
@@ -67,7 +63,6 @@ const EnergyCharts: React.FC<EnergyChartsProps> = ({
             Math.round(city.windMonthly[currentMonthKey])
     })) : [];
 
-    // Cria ranking solar ordenado
     const solarRanking = energyData.length > 0 ? 
         [...energyData]
             .sort((a, b) => {
@@ -82,7 +77,6 @@ const EnergyCharts: React.FC<EnergyChartsProps> = ({
                 value: `${Math.round(isAnnual ? city.solarAnnual : city.solarMonthly[currentMonthKey])} kWh/m²`
             })) : [];
 
-    // Cria ranking eólico ordenado
     const windRanking = energyData.length > 0 ? 
         [...energyData]
             .sort((a, b) => {
@@ -105,11 +99,9 @@ const EnergyCharts: React.FC<EnergyChartsProps> = ({
                 </Alert>
             )}
             
-            {/* Seletor de Mês */}
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
             </Box>
 
-            {/* Gráficos de Energia */}
             <Box sx={{ 
                 display: 'flex', 
                 gap: 1.5, 
@@ -118,7 +110,6 @@ const EnergyCharts: React.FC<EnergyChartsProps> = ({
                 alignItems: 'stretch',
                 overflow: 'hidden'
             }}>
-                {/* Gráfico Energia Solar */}
                 <Box sx={{ flex: '3', minWidth: '0' }}>
                     {loading ? (
                         <ChartSkeleton />
@@ -200,7 +191,6 @@ const EnergyCharts: React.FC<EnergyChartsProps> = ({
                     )}
                 </Box>
 
-                {/* Ranking Energia Solar */}
                 <Box sx={{ flex: '2', minWidth: '0' }}>
                     {loading ? (
                         <RankingSkeleton />
@@ -251,7 +241,6 @@ const EnergyCharts: React.FC<EnergyChartsProps> = ({
                     )}
                 </Box>
 
-                {/* Gráfico Energia Eólica */}
                 <Box sx={{ flex: '3', minWidth: '0' }}>
                     {loading ? (
                         <ChartSkeleton />
@@ -333,7 +322,6 @@ const EnergyCharts: React.FC<EnergyChartsProps> = ({
                     )}
                 </Box>
 
-                {/* Ranking Energia Eólica */}
                 <Box sx={{ flex: '2', minWidth: '0' }}>
                     {loading ? (
                         <RankingSkeleton />
