@@ -5,11 +5,11 @@ import { useApp } from '../../../contexts/AppContext';
 const CalendarCard: React.FC = () => {
     const { state, setSelectedDate, setSelectedTime, updateCalendarMonth } = useApp();
     const { calendar, selectedDate, selectedTime } = state;
-    
-    const daysOfWeek = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+
+    const daysOfWeek = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
     const monthNames = [
-        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
     ];
 
     // Gera os dias do calendário para o mês atual
@@ -62,33 +62,41 @@ const CalendarCard: React.FC = () => {
 
     // Seleção de horário
     const handleTimeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const hour = parseInt(event.target.value);
-        if (!isNaN(hour)) {
-            setSelectedTime({
-                hour,
-                formatted: `${hour.toString().padStart(2, '0')}:00`
-            });
+        const value = event.target.value;
+        if (value === '') {
+            // Horário não definido
+            setSelectedTime(null);
+        } else {
+            const hour = parseInt(value);
+            if (!isNaN(hour)) {
+                setSelectedTime({
+                    hour,
+                    formatted: `${hour.toString().padStart(2, '0')}:00`
+                });
+            }
         }
     };
 
-    // Gera opções de horário (0-23)
-    const timeOptions = Array.from({ length: 24 }, (_, i) => ({
-        hour: i,
-        formatted: `${i.toString().padStart(2, '0')}:00`
-    }));
+    // Gera opções de horário (inclui opção para "todos os horários")
+    const timeOptions = [
+        { hour: undefined, formatted: 'All Day' },
+        ...Array.from({ length: 24 }, (_, i) => ({
+            hour: i,
+            formatted: `${i.toString().padStart(2, '0')}:00`
+        }))
+    ];
 
     return (
         <div className="calendar-card">
             <div className="card-header">
-                <span className="header-title">Criar Relatório</span>
+                <span className="header-title">Create Report</span>
                 <select 
                     className="time-select" 
-                    value={selectedTime.hour} 
+                    value={selectedTime?.hour ?? ''} 
                     onChange={handleTimeChange}
                 >
-                    <option value="">Selecione um horário</option>
-                    {timeOptions.map(({ hour, formatted }) => (
-                        <option key={hour} value={hour}>
+                    {timeOptions.map(({ hour, formatted }, index) => (
+                        <option key={index} value={hour ?? ''}>
                             {formatted}
                         </option>
                     ))}
