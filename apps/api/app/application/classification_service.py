@@ -60,7 +60,7 @@ class WeatherClassificationService:
             if hist_t_max and predicted_t_max is not None:
                 classifications.very_hot_temp_percentile = percentileofscore(
                     hist_t_max, predicted_t_max, kind='rank'
-                )
+                )/100
             
             # Snow probability
             classifications.very_snowy_probability = self._calculate_snow_probability(
@@ -79,7 +79,7 @@ class WeatherClassificationService:
         if hist_wind and predicted_wind is not None:
             classifications.very_windy_percentile = percentileofscore(
                 hist_wind, predicted_wind, kind='rank'
-            )
+            )/100
         
         # Stormy weather probability
         wet_classifications = self._calculate_wet_probability(
@@ -161,7 +161,7 @@ class WeatherClassificationService:
         if historical_heat_index:
             predicted_heat_index = calculate_heat_index(predicted_t_avg, predicted_rh2m)
             if predicted_heat_index is not None:
-                return percentileofscore(historical_heat_index, predicted_heat_index, kind='rank')
+                return percentileofscore(historical_heat_index, predicted_heat_index, kind='rank')/100
         
         return None
     

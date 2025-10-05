@@ -160,7 +160,7 @@ def calculate_classifications(
         predicted_t_max = daily_values.get("T2M_MAX", {}).get("value")
         hist_t_max = _get_sanitized_series("T2M_MAX")
         if hist_t_max and predicted_t_max is not None:
-            classifications["very_hot_temp_percentile"] = percentileofscore(hist_t_max, predicted_t_max, kind='rank')
+            classifications["very_hot_temp_percentile"] = percentileofscore(hist_t_max, predicted_t_max, kind='rank')/100
         
         hist_snow = _get_sanitized_series("FRSNO")
         if predicted_t_avg is not None and predicted_t_avg > 2.0:
@@ -182,12 +182,12 @@ def calculate_classifications(
     if historical_heat_index and predicted_t_avg is not None and predicted_rh2m is not None:
         predicted_heat_index = calculate_heat_index(predicted_t_avg, predicted_rh2m)
         if predicted_heat_index is not None:
-            classifications["very_hot_feels_like_percentile"] = percentileofscore(historical_heat_index, predicted_heat_index, kind='rank')
+            classifications["very_hot_feels_like_percentile"] = percentileofscore(historical_heat_index, predicted_heat_index, kind='rank')/100
 
     hist_wind = _get_sanitized_series("WS10M")
     predicted_wind = daily_values.get("WS10M", {}).get("value")
     if hist_wind and predicted_wind is not None:
-        classifications["very_windy_percentile"] = percentileofscore(hist_wind, predicted_wind, kind='rank')
+        classifications["very_windy_percentile"] = percentileofscore(hist_wind, predicted_wind, kind='rank')/100
 
     hist_precip_full = _get_sanitized_series(precip_param)
     if hist_precip_full and hist_wind:
