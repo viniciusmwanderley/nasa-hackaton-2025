@@ -1,8 +1,8 @@
-# Outdoor Risk - NASA Hackathon 2025 Technical Documentation
+# WeatherData - NASA Hackathon 2025 Technical Documentation
 
 <div align="center">
 
-![Outdoor Risk Logo](../front/src/assets/painel.png)
+![WeatherData Logo](../front/src/assets/painel.png)
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
@@ -14,7 +14,85 @@
 
 ## 📋 Project Overview
 
-Outdoor Risk is an innovative solution developed during NASA Space Apps Challenge 2025. This comprehensive platform harnesses NASA's Earth observation data to provide accurate weather risk assessments and predictions for outdoor activities. By combining multiple data sources and employing advanced analytics, we deliver precise, location-specific risk evaluations to help users make informed decisions about their outdoor plans.
+WeatherData is an innovative solution that provides comprehensive weather analysis and risk assessment through multiple specialized applications. Each application is designed to handle specific aspects of weather data processing and visualization.
+
+### 💻 Applications Overview
+
+#### 1. WeatherData API (apps/api)
+- **Purpose**: Core backend service providing weather data processing and analysis
+- **Key Features**:
+  - NASA POWER API integration
+  - IMERG data processing
+  - Weather risk calculations
+  - Historical data analysis
+  - RESTful API endpoints
+
+##### Key Components:
+- **Weather Service** (`app/application/weather_service.py`)
+  - Real-time weather data processing
+  - Risk assessment calculations
+  - Historical pattern analysis
+
+- **Climate Service** (`app/application/climate_energy_service.py`)
+  - Climate data aggregation
+  - Energy metrics calculation
+  - Long-term trend analysis
+
+- **Classification Service** (`app/application/classification_service.py`)
+  - Weather pattern classification
+  - Risk level categorization
+  - Automated weather warnings
+
+#### 2. WeatherData Frontend (front/)
+- **Purpose**: User interface for weather data visualization and interaction
+- **Key Features**:
+  - Interactive weather maps
+  - Risk visualization dashboards
+  - Real-time updates
+  - Data export capabilities
+
+##### Key Components:
+- **Dashboard** (`src/pages/Dashboard/`)
+  - Main interface for weather monitoring
+  - Real-time data visualization
+  - Risk assessment displays
+
+- **Energy Panel** (`src/pages/EnergyPanel/`)
+  - Energy-related weather impacts
+  - Renewable energy forecasting
+  - Consumption pattern analysis
+
+- **Weather Cards** (`src/components/cards/`)
+  - Daily forecasts
+  - Risk indicators
+  - Meteorological metrics
+  - Precipitation charts
+
+#### 3. Data Processing Pipeline
+- **Purpose**: Background processing and data aggregation
+- **Components**:
+  - Weather data collectors
+  - Risk calculation workers
+  - Data aggregation services
+  - Cache management
+
+#### 4. Monitoring & Analytics
+- **Purpose**: System health and performance monitoring
+- **Components**:
+  - Prometheus metrics
+  - Grafana dashboards
+  - ELK stack for logging
+  - Alert management
+
+### System Integration
+
+These applications work together to provide a complete weather analysis solution:
+1. The API processes raw NASA data and provides structured endpoints
+2. The Frontend consumes these endpoints and presents data visually
+3. Background workers handle heavy processing tasks
+4. Monitoring ensures system reliability
+
+WeatherData is developed during NASA Space Apps Challenge 2025. This comprehensive platform harnesses NASA's Earth observation data to provide accurate weather risk assessments and predictions for outdoor activities. By combining multiple data sources and employing advanced analytics, we deliver precise, location-specific risk evaluations to help users make informed decisions about their outdoor plans.
 
 ### 🎯 Core Objectives
 
@@ -78,7 +156,7 @@ Outdoor Risk is an innovative solution developed during NASA Space Apps Challeng
 
 ### System Overview
 
-The Outdoor Risk system architecture follows a modern microservices-based approach, leveraging cloud-native technologies and best practices for scalability, reliability, and maintainability.
+The WeatherData system architecture follows a modern microservices-based approach, leveraging cloud-native technologies and best practices for scalability, reliability, and maintainability.
 
 #### System Components
 

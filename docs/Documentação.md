@@ -1,8 +1,8 @@
-# Outdoor Risk - Documentação Técnica NASA Hackathon 2025
+# WeatherData - Documentação Técnica NASA Hackathon 2025
 
 <div align="center">
 
-![Outdoor Risk Logo](../front/src/assets/painel.png)
+![WeatherData Logo](../front/src/assets/painel.png)
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
@@ -14,7 +14,85 @@
 
 ## 📋 Visão Geral do Projeto
 
-Outdoor Risk é uma solução inovadora desenvolvida durante o NASA Space Apps Challenge 2025. Esta plataforma abrangente utiliza dados de observação terrestre da NASA para fornecer avaliações e previsões precisas de risco meteorológico para atividades ao ar livre. Combinando múltiplas fontes de dados e empregando análises avançadas, entregamos avaliações de risco precisas e específicas para cada localização, ajudando os usuários a tomarem decisões informadas sobre seus planos ao ar livre.
+WeatherData é uma solução inovadora que fornece análise meteorológica abrangente e avaliação de riscos através de múltiplas aplicações especializadas. Cada aplicação é projetada para lidar com aspectos específicos do processamento e visualização de dados meteorológicos.
+
+### 💻 Visão Geral das Aplicações
+
+#### 1. WeatherData API (apps/api)
+- **Objetivo**: Serviço backend principal fornecendo processamento e análise de dados meteorológicos
+- **Funcionalidades Principais**:
+  - Integração com API NASA POWER
+  - Processamento de dados IMERG
+  - Cálculos de risco meteorológico
+  - Análise de dados históricos
+  - Endpoints API RESTful
+
+##### Componentes Principais:
+- **Serviço de Clima** (`app/application/weather_service.py`)
+  - Processamento de dados meteorológicos em tempo real
+  - Cálculos de avaliação de risco
+  - Análise de padrões históricos
+
+- **Serviço de Clima e Energia** (`app/application/climate_energy_service.py`)
+  - Agregação de dados climáticos
+  - Cálculo de métricas de energia
+  - Análise de tendências de longo prazo
+
+- **Serviço de Classificação** (`app/application/classification_service.py`)
+  - Classificação de padrões meteorológicos
+  - Categorização de níveis de risco
+  - Alertas meteorológicos automatizados
+
+#### 2. WeatherData Frontend (front/)
+- **Objetivo**: Interface do usuário para visualização e interação com dados meteorológicos
+- **Funcionalidades Principais**:
+  - Mapas meteorológicos interativos
+  - Dashboards de visualização de risco
+  - Atualizações em tempo real
+  - Capacidades de exportação de dados
+
+##### Componentes Principais:
+- **Dashboard** (`src/pages/Dashboard/`)
+  - Interface principal para monitoramento meteorológico
+  - Visualização de dados em tempo real
+  - Exibição de avaliação de riscos
+
+- **Painel de Energia** (`src/pages/EnergyPanel/`)
+  - Impactos meteorológicos relacionados à energia
+  - Previsão de energia renovável
+  - Análise de padrões de consumo
+
+- **Cartões de Clima** (`src/components/cards/`)
+  - Previsões diárias
+  - Indicadores de risco
+  - Métricas meteorológicas
+  - Gráficos de precipitação
+
+#### 3. Pipeline de Processamento de Dados
+- **Objetivo**: Processamento em background e agregação de dados
+- **Componentes**:
+  - Coletores de dados meteorológicos
+  - Workers de cálculo de risco
+  - Serviços de agregação de dados
+  - Gerenciamento de cache
+
+#### 4. Monitoramento & Análise
+- **Objetivo**: Monitoramento de saúde e performance do sistema
+- **Componentes**:
+  - Métricas Prometheus
+  - Dashboards Grafana
+  - Stack ELK para logging
+  - Gerenciamento de alertas
+
+### Integração do Sistema
+
+Estas aplicações trabalham juntas para fornecer uma solução completa de análise meteorológica:
+1. A API processa dados brutos da NASA e fornece endpoints estruturados
+2. O Frontend consome esses endpoints e apresenta os dados visualmente
+3. Workers em background lidam com tarefas pesadas de processamento
+4. O Monitoramento garante a confiabilidade do sistema
+
+WeatherData é desenvolvida durante o NASA Space Apps Challenge 2025. Esta plataforma abrangente utiliza dados de observação terrestre da NASA para fornecer avaliações e previsões precisas de risco meteorológico para atividades ao ar livre. Combinando múltiplas fontes de dados e empregando análises avançadas, entregamos avaliações de risco precisas e específicas para cada localização, ajudando os usuários a tomarem decisões informadas sobre seus planos ao ar livre.
 
 ### 🎯 Objetivos Principais
 
@@ -78,7 +156,7 @@ Outdoor Risk é uma solução inovadora desenvolvida durante o NASA Space Apps C
 
 ### Visão Geral do Sistema
 
-A arquitetura do sistema Outdoor Risk segue uma abordagem moderna baseada em microsserviços, utilizando tecnologias cloud-native e melhores práticas para escalabilidade, confiabilidade e manutenibilidade.
+A arquitetura do sistema WeatherData segue uma abordagem moderna baseada em microsserviços, utilizando tecnologias cloud-native e melhores práticas para escalabilidade, confiabilidade e manutenibilidade.
 
 #### Componentes do Sistema
 
