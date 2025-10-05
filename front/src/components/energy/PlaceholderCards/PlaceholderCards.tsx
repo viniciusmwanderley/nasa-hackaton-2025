@@ -12,7 +12,6 @@ const PlaceholderCards: React.FC = () => {
             {cards.map((card) => (
                 <div key={card.id} className="placeholder-card">
                     <div className="placeholder-content">
-                        {/* Conteúdo placeholder - pode ser substituído posteriormente */}
                     </div>
                 </div>
             ))}

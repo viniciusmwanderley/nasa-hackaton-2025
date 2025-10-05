@@ -213,6 +213,4 @@ export const exportWeatherDataToCSV = (state: AppState): void => {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  
-  console.log('CSV exported successfully:', filename);
 };

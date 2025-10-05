@@ -27,7 +27,6 @@ export const useEnergyData = (
   const [selectedCity, setSelectedCity] = useState(initialCity);
   const [selectedMonth, setSelectedMonth] = useState('ANN');
 
-  // Função para carregar dados de uma cidade específica
   const loadSingleCityData = useCallback(async (cityKey: string) => {
     const cityInfo = CITY_COORDINATES[cityKey as CityKey];
     if (!cityInfo) {
@@ -53,7 +52,6 @@ export const useEnergyData = (
     }
   }, []);
 
-  // Função para carregar dados de múltiplas cidades
   const loadMultiCityData = useCallback(async (cityKeys: string[]) => {
     setLoading(true);
     setError(null);
@@ -79,24 +77,20 @@ export const useEnergyData = (
     }
   }, []);
 
-  // Função para atualizar a cidade selecionada
   const handleCityChange = useCallback((city: string) => {
     setSelectedCity(city);
     loadSingleCityData(city);
   }, [loadSingleCityData]);
 
-  // Função para atualizar o mês selecionado
   const handleMonthChange = useCallback((month: string) => {
     setSelectedMonth(month);
   }, []);
 
-  // Função para recarregar todos os dados
   const refreshData = useCallback(() => {
     loadSingleCityData(selectedCity);
     loadMultiCityData(initialCities);
   }, [selectedCity, initialCities, loadSingleCityData, loadMultiCityData]);
 
-  // Efeito para carregar dados iniciais
   useEffect(() => {
     loadSingleCityData(selectedCity);
     loadMultiCityData(initialCities);

@@ -12,16 +12,14 @@ const CalendarCard: React.FC = () => {
         'July', 'August', 'September', 'October', 'November', 'December'
     ];
 
-    // Gera os dias do calendário para o mês atual
     const generateCalendarDays = (year: number, month: number) => {
         const firstDay = new Date(year, month, 1);
         const startDate = new Date(firstDay);
-        startDate.setDate(startDate.getDate() - firstDay.getDay()); // Começa no domingo
+        startDate.setDate(startDate.getDate() - firstDay.getDay()); 
         
         const days = [];
         const current = new Date(startDate);
         
-        // Gera 42 dias (6 semanas x 7 dias) para preencher o grid
         for (let i = 0; i < 42; i++) {
             const isCurrentMonth = current.getMonth() === month;
             const dateString = current.toISOString().split('T')[0];
@@ -42,7 +40,6 @@ const CalendarCard: React.FC = () => {
 
     const calendarDays = generateCalendarDays(calendar.currentYear, calendar.currentMonth);
     
-    // Navegação de mês
     const goToPreviousMonth = () => {
         const newMonth = calendar.currentMonth === 0 ? 11 : calendar.currentMonth - 1;
         const newYear = calendar.currentMonth === 0 ? calendar.currentYear - 1 : calendar.currentYear;
@@ -55,7 +52,6 @@ const CalendarCard: React.FC = () => {
         updateCalendarMonth(newMonth, newYear);
     };
 
-    // Seleção de data
     const handleDateClick = async (dateString: string) => {
         await setSelectedDate(dateString);
     };

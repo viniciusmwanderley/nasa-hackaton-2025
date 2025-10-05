@@ -8,7 +8,6 @@ interface EnergyChartProps {
 }
 
 const EnergyChart: React.FC<EnergyChartProps> = ({ type, title }) => {
-    // Dados mockados para os gráficos
     const solarData = [
         { city: 'João Pessoa', value: 250, shortName: 'João\nPessoa' },
         { city: 'São José de Sabugi', value: 580, shortName: 'São José\nde Sabugi' },

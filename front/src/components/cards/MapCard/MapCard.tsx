@@ -20,10 +20,8 @@ const MapCard: React.FC = () => {
   };
 
   useEffect(() => {
-    console.log('Mapa atualizado para:', location.city);
   }, [location]);
 
-  // Se está carregando, mostra skeleton
   if (state.isLoading) {
     return <MapCardSkeleton />;
   }

@@ -1,5 +1,3 @@
-// Tipos para os componentes da aplicação
-
 export interface WeatherData {
   temperature: number;
   description: string;
@@ -25,7 +23,7 @@ export interface DayForecast {
   date: string;
   minTemperature?: number;
   maxTemperature?: number;
-  temperature?: number; // Para quando horário específico está definido
+  temperature?: number; 
   condition: 'sunny' | 'cloudy' | 'rainy';
 }
 
@@ -39,15 +37,14 @@ export interface CalendarData {
   currentMonth: number; // 0-11
   currentYear: number;
   selectedDate: string | null; // YYYY-MM-DD
-  availableDates: string[]; // Datas com dados disponíveis
+  availableDates: string[]; 
 }
 
 export interface TimeSelection {
-  hour?: number; // 0-23, undefined para todos os horários
-  formatted: string; // "HH:00" ou "Todos os horários"
+  hour?: number; // 0-23
+  formatted: string; // "HH:MM"
 }
 
-// Estado global da aplicação
 export interface AppState {
   location: Location;
   selectedDate: string;
@@ -65,7 +62,6 @@ export interface AppState {
   } | null;
 }
 
-// Configurações da aplicação
 export interface AppConfig {
   windowDays: number;
   baselineStart: number;

@@ -2,12 +2,10 @@
 import type { Location } from '../types/app';
 
 /**
- * Detecta o timezone baseado na localização (latitude/longitude)
- * Usa uma API gratuita para detectar o timezone ou fallback para mapeamento manual
+ * Detecting timezone from coordinates using a free API with fallback to manual mapping
  */
 export const getTimezoneFromLocation = async (location: Location): Promise<string> => {
   try {
-    // Primeiro, tenta usar a API do TimeZone DB (gratuita)
     const response = await fetch(
       `https://api.timezonedb.com/v2.1/get-time-zone?key=demo&format=json&by=position&lat=${location.latitude}&lng=${location.longitude}`
     );
@@ -19,45 +17,36 @@ export const getTimezoneFromLocation = async (location: Location): Promise<strin
       }
     }
   } catch (error) {
-    console.warn('Erro ao buscar timezone da API:', error);
+    console.warn('Error fetching timezone from API:', error);
   }
 
-  // Fallback: mapeamento manual baseado no país/coordenadas
   return getTimezoneByCountryAndCoordinates(location);
 };
 
-/**
- * Mapeamento manual de timezone baseado no país e coordenadas
- */
+
 const getTimezoneByCountryAndCoordinates = (location: Location): string => {
   const { country, latitude, longitude } = location;
 
-  // Brasil - múltiplos fusos horários
   if (country === 'BR' || country === 'Brazil') {
-    // Acre e parte do Amazonas (UTC-5)
     if (longitude < -67) {
       return 'America/Rio_Branco';
     }
-    // Amazonas, Roraima, Rondônia, Mato Grosso (UTC-4)
     else if (longitude < -57 || (latitude > -10 && longitude < -60)) {
       return 'America/Manaus';
     }
-    // Fernando de Noronha (UTC-2)
     else if (latitude < -3 && longitude > -33) {
       return 'America/Noronha';
     }
-    // Resto do Brasil (UTC-3)
     else {
       return 'America/Sao_Paulo';
     }
   }
 
-  // Estados Unidos - múltiplos fusos
   if (country === 'US' || country === 'United States') {
-    if (longitude > -87) return 'America/New_York';        // Eastern
-    if (longitude > -102) return 'America/Chicago';        // Central
-    if (longitude > -115) return 'America/Denver';         // Mountain
-    return 'America/Los_Angeles';                          // Pacific
+    if (longitude > -87) return 'America/New_York';        
+    if (longitude > -102) return 'America/Chicago';        
+    if (longitude > -115) return 'America/Denver';         
+    return 'America/Los_Angeles';                          
   }
 
   // Argentina
@@ -70,7 +59,7 @@ const getTimezoneByCountryAndCoordinates = (location: Location): string => {
     return 'America/Santiago';
   }
 
-  // Colômbia
+  // Colombia
   if (country === 'CO' || country === 'Colombia') {
     return 'America/Bogota';
   }
@@ -85,27 +74,27 @@ const getTimezoneByCountryAndCoordinates = (location: Location): string => {
     return 'America/Lima';
   }
 
-  // México
+  // Mexico
   if (country === 'MX' || country === 'Mexico') {
     return 'America/Mexico_City';
   }
 
-  // Reino Unido
+  // UK
   if (country === 'GB' || country === 'UK' || country === 'United Kingdom') {
     return 'Europe/London';
   }
 
-  // França
+  // France
   if (country === 'FR' || country === 'France') {
     return 'Europe/Paris';
   }
 
-  // Alemanha
+  // Germany
   if (country === 'DE' || country === 'Germany') {
     return 'Europe/Berlin';
   }
 
-  // Espanha
+  // Spain
   if (country === 'ES' || country === 'Spain') {
     return 'Europe/Madrid';
   }
@@ -115,12 +104,12 @@ const getTimezoneByCountryAndCoordinates = (location: Location): string => {
     return 'Europe/Lisbon';
   }
 
-  // Itália
+  // Italy
   if (country === 'IT' || country === 'Italy') {
     return 'Europe/Rome';
   }
 
-  // Japão
+  // Japan
   if (country === 'JP' || country === 'Japan') {
     return 'Asia/Tokyo';
   }
@@ -130,30 +119,25 @@ const getTimezoneByCountryAndCoordinates = (location: Location): string => {
     return 'Asia/Shanghai';
   }
 
-  // Índia
+  // India
   if (country === 'IN' || country === 'India') {
     return 'Asia/Kolkata';
   }
 
-  // Austrália - aproximação
+  // Australia 
   if (country === 'AU' || country === 'Australia') {
     if (longitude < 130) return 'Australia/Perth';      // Western
     if (longitude < 140) return 'Australia/Adelaide';   // Central
     return 'Australia/Sydney';                          // Eastern
   }
 
-  // Fallback baseado nas coordenadas (aproximação)
   return getTimezoneByCoordinates(latitude, longitude);
 };
 
-/**
- * Fallback final baseado apenas nas coordenadas
- */
+
 const getTimezoneByCoordinates = (_latitude: number, longitude: number): string => {
-  // Divisão aproximada por fusos horários (cada 15° de longitude = 1 hora)
   const timezoneOffset = Math.round(longitude / 15);
   
-  // Mapeamento aproximado para timezones conhecidos
   const timezoneMap: { [key: string]: string } = {
     '-12': 'Pacific/Auckland',      // UTC-12
     '-11': 'Pacific/Samoa',         // UTC-11
@@ -185,9 +169,7 @@ const getTimezoneByCoordinates = (_latitude: number, longitude: number): string 
   return timezoneMap[timezoneOffset.toString()] || 'UTC';
 };
 
-/**
- * Versão síncrona que usa apenas o mapeamento manual (mais rápida)
- */
+
 export const getTimezoneFromLocationSync = (location: Location): string => {
   return getTimezoneByCountryAndCoordinates(location);
 };
