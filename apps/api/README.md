@@ -63,11 +63,24 @@ response = requests.post("http://localhost:8000/weather/analyze", json={
     "latitude": -8.0476,
     "longitude": -34.8770, 
     "center_datetime": "2024-07-15T14:00:00-03:00",
-    "target_timezone": "America/Recife",
+    "target_timezone": "America/Fortaleza",
     "days_before": 3,
     "days_after": 3,
     "granularity": "daily"
 })
+
+# Equivalent curl command
+curl -X POST "http://localhost:8000/weather/analyze" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "latitude": -8.0476,
+    "longitude": -34.8770,
+    "center_datetime": "2024-07-15T14:00:00-03:00",
+    "target_timezone": "America/Fortaleza",
+    "days_before": 3,
+    "days_after": 3,
+    "granularity": "daily"
+  }'
 
 result = response.json()
 print(f"Rain probability: {result['classifications']['rain_probability']:.1%}")

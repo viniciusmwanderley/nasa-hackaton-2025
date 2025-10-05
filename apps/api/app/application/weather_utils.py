@@ -2,7 +2,7 @@
 # ABOUTME: Contains functions for heat index, historical statistics, and temporal predictions
 
 import logging
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from typing import Dict, List, Optional, Any
 import numpy as np
 from scipy.stats import percentileofscore
@@ -108,7 +108,7 @@ def predict_with_temporal_regression(
             continue
         
         try:
-            d = datetime.strptime(date_str, date_format).replace(tzinfo=datetime.timezone.utc)
+            d = datetime.strptime(date_str, date_format).replace(tzinfo=timezone.utc)
             is_in_day_window = d.timetuple().tm_yday in doy_range
             is_correct_hour = True if granularity == Granularity.DAILY else d.hour == target_dt.hour
             

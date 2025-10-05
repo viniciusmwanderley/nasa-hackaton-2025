@@ -50,12 +50,12 @@ class WeatherClassificationService:
         )
         
         # Temperature classifications
-        predicted_t_avg = daily_values.get("T2M", {}).get("value")
-        predicted_rh2m = daily_values.get("RH2M", {}).get("value")
+        predicted_t_avg = daily_values.get("T2M").value
+        predicted_rh2m = daily_values.get("RH2M").value
         
         if granularity == Granularity.DAILY:
             # Hot temperature percentile
-            predicted_t_max = daily_values.get("T2M_MAX", {}).get("value")
+            predicted_t_max = daily_values.get("T2M_MAX").value
             hist_t_max = get_sanitized_series(all_historical_series, "T2M_MAX")
             if hist_t_max and predicted_t_max is not None:
                 classifications.very_hot_temp_percentile = percentileofscore(
@@ -74,7 +74,7 @@ class WeatherClassificationService:
             )
         
         # Wind percentile
-        predicted_wind = daily_values.get("WS10M", {}).get("value")
+        predicted_wind = daily_values.get("WS10M").value if daily_values.get("WS10M") else None
         hist_wind = get_sanitized_series(all_historical_series, "WS10M")
         if hist_wind and predicted_wind is not None:
             classifications.very_windy_percentile = percentileofscore(
