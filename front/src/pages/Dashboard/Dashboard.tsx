@@ -74,7 +74,7 @@ const Dashboard: React.FC = () => {
         console.log('Enviando parâmetros para a API:', params);
 
         try {
-            console.log('Fazendo fetch para:', 'http://localhost:8000/weather/analyze/');
+            console.log('Fazendo fetch para a API de análise do tempo');
             
             const response = await fetch('https://nasa-hackaton-2025-ten.vercel.app/weather/analyze', {
                 method: 'POST',
