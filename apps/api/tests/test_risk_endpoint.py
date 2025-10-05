@@ -49,8 +49,6 @@ class TestRiskEndpoint:
                     relative_humidity=65.0,
                     wind_speed_ms=5.0,
                     precipitation_mm_per_day=0.0,
-                    precipitation_mm_hourly=0.0,
-                    precipitation_source="POWER",
                     data_source="POWER",
                 )
             ]

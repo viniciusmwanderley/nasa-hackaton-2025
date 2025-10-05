@@ -428,7 +428,6 @@ class TestCollectSamplesForYear:
 
         samples = await _collect_samples_for_year(
             power_client=mock_power_client,
-            precipitation_client=None,  # Temporarily disabled
             latitude=-3.7319,
             longitude=-38.5267,
             year=2023,
@@ -466,7 +465,6 @@ class TestCollectSamplesForYear:
 
         samples = await _collect_samples_for_year(
             power_client=mock_power_client,
-            precipitation_client=None,  # Temporarily disabled
             latitude=-3.7319,
             longitude=-38.5267,
             year=2023,
@@ -498,7 +496,6 @@ class TestCollectSamplesForYear:
 
         samples = await _collect_samples_for_year(
             power_client=mock_power_client,
-            precipitation_client=None,  # Temporarily disabled
             latitude=-3.7319,
             longitude=-38.5267,
             year=2024,  # Leap year

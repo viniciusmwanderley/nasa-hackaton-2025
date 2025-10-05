@@ -11,9 +11,6 @@ from ..config import Settings
 from ..time.timezone import get_day_of_year, parse_date, to_local, tz_for_point
 from ..weather.power import PowerAPIError, PowerClient
 
-# Import precipitation client - temporarily disabled for testing
-# from ..clients.precipitation import PrecipitationClient, create_precipitation_client
-
 logger = logging.getLogger(__name__)
 
 
@@ -32,14 +29,9 @@ class WeatherSample:
     temperature_c: float
     relative_humidity: float
     wind_speed_ms: float
-    precipitation_mm_per_day: float  # Daily total from POWER (fallback)
+    precipitation_mm_per_day: float  # Daily total from NASA POWER API
 
-    # Enhanced precipitation data (from IMERG + fallback)
-    precipitation_mm_hourly: float | None = None  # Hourly precipitation at target hour
-    precipitation_source: str = "POWER"  # "IMERG" or "POWER_fallback"
-    precipitation_quality: float | None = None  # Quality score 0-1
-
-    # Data quality/provenance
+    # Data quality/provenance  
     data_source: str = "POWER"
 
 
@@ -89,7 +81,6 @@ async def collect_samples(
     baseline_end_year: int = 2023,
     settings: Settings | None = None,
     power_client: PowerClient | None = None,
-    # precipitation_client: Optional[PrecipitationClient] = None
 ) -> SampleCollection:
     """
     Collect weather samples over DOY±window_days at target local hour across baseline years.
@@ -97,8 +88,8 @@ async def collect_samples(
     This function:
     1. Resolves target date to DOY (day of year)
     2. For each year in baseline range, calculates date range around target DOY
-    3. Fetches NASA POWER data for that date range
-    4. Filters to samples matching target local hour
+    3. Fetches NASA POWER data for that date range (including precipitation)
+    4. Filters to samples matching target local hour  
     5. Validates coverage meets minimum requirements
 
     Args:
@@ -167,10 +158,7 @@ async def collect_samples(
     if power_client is None:
         power_client = PowerClient(settings)
 
-    # Create precipitation client if not provided (temporarily disabled)
-    # if precipitation_client is None:
-    #     precipitation_client = create_precipitation_client(settings)
-    precipitation_client = None
+    # Precipitation data comes from NASA POWER API - no separate client needed
 
     # Collect samples for each year
     all_samples: list[WeatherSample] = []
@@ -182,7 +170,6 @@ async def collect_samples(
         try:
             year_samples = await _collect_samples_for_year(
                 power_client=power_client,
-                precipitation_client=None,  # Temporarily disabled
                 latitude=latitude,
                 longitude=longitude,
                 year=year,
@@ -247,7 +234,6 @@ async def collect_samples(
 
 async def _collect_samples_for_year(
     power_client: PowerClient,
-    precipitation_client: Any | None,
     latitude: float,
     longitude: float,
     year: int,
@@ -358,14 +344,6 @@ async def _collect_samples_for_year(
             if precipitation_mm_per_day is None:
                 precipitation_mm_per_day = 0.0
 
-            # Get hourly precipitation data (simplified for now)
-            # TODO: Re-enable IMERG integration once precipitation client is working
-            hourly_precip = (
-                precipitation_mm_per_day / 24.0 if precipitation_mm_per_day > 0 else 0.0
-            )
-            precip_source = "POWER_daily_estimate"
-            precip_quality = 0.8
-
             # Create sample
             sample = WeatherSample(
                 timestamp_utc=sample_datetime_utc,
@@ -378,9 +356,6 @@ async def _collect_samples_for_year(
                 relative_humidity=relative_humidity,
                 wind_speed_ms=wind_speed_ms,
                 precipitation_mm_per_day=precipitation_mm_per_day,
-                precipitation_mm_hourly=hourly_precip,
-                precipitation_source=precip_source,
-                precipitation_quality=precip_quality,
                 data_source="POWER",
             )
 
