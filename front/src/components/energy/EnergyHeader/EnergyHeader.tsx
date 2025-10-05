@@ -9,24 +9,37 @@ import {
     ClickAwayListener,
     Select,
     MenuItem,
-    IconButton
+    IconButton,
+    Button,
+    Box
 } from '@mui/material';
-import { Search, Close, ArrowDropDown } from '@mui/icons-material';
+import { Search, Close, ArrowDropDown, Send, ArrowBack } from '@mui/icons-material';
 import styles from './EnergyHeader.module.css';
 import { geocodeLocation } from '../../../utils/api';
 import type { Location } from '../../../types/app';
 
 interface EnergyHeaderProps {
     onLocationsChange?: (locations: Location[]) => void;
+    selectedMonth?: string;
+    onMonthChange?: (month: string) => void;
+    onAnalyzeClick?: (locations: Location[], month: string) => void;
+    isAnalyzing?: boolean;
+    onBackToDashboard?: () => void;
 }
 
-const EnergyHeader: React.FC<EnergyHeaderProps> = ({ onLocationsChange }) => {
+const EnergyHeader: React.FC<EnergyHeaderProps> = ({ 
+    onLocationsChange,
+    selectedMonth = '',
+    onMonthChange,
+    onAnalyzeClick,
+    isAnalyzing = false,
+    onBackToDashboard
+}) => {
     const [locationQuery, setLocationQuery] = useState('');
     const [isSearching, setIsSearching] = useState(false);
     const [searchResults, setSearchResults] = useState<Location[]>([]);
     const [selectedLocations, setSelectedLocations] = useState<Location[]>([]);
-    const [showDropdown, setShowDropdown] = useState(false);
-    const [selectedMonth, setSelectedMonth] = useState<string>(''); 
+    const [showDropdown, setShowDropdown] = useState(false); 
 
     const handleLocationSearch = useCallback(async (query: string) => {
         setLocationQuery(query);
@@ -98,144 +111,182 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({ onLocationsChange }) => {
         setSearchResults([]);
     };
 
-    // Renderização do componente
+    // O botão deve estar habilitado se tiver pelo menos 1 localização (1-5)
+    const isGenerateEnabled = selectedLocations.length >= 1 && selectedLocations.length <= 5 && !isAnalyzing;
+
     return (
-        <div>
-            {/* Logo */}
-            <div className={styles.logoSection}>
-                <img 
-                    src="/weatherdata.png" 
-                    alt="CLIMADATA" 
-                    className={styles.logoImage}
-                />
+        <div className={styles.container}>
+            {/* Header com logo e botão de voltar */}
+            <div className={styles.topHeader}>
+                <div className={styles.logoSection}>
+                    <Button
+                        startIcon={<ArrowBack />}
+                        onClick={onBackToDashboard}
+                        className={styles.backButton}
+                    >
+                        Back to Dashboard
+                    </Button>
+                    <img 
+                        src="/weatherdata.png" 
+                        alt="CLIMADATA" 
+                        className={styles.logoImage}
+                    />
+                </div>
             </div>
 
             {/* Card branco principal */}
-            <div className={styles.whiteCard}>
+            <Paper className={styles.whiteCard} elevation={2}>
                 <div className={styles.mainRow}>
-                    {/* Título */}
+                    {/* Título à esquerda */}
                     <div className={styles.titleSection}>
                         <Typography variant="h4" className={styles.title}>
-                            Indicadores de Oportunidades Renováveis
+                            Renewable Opportunities Indicators
+                        </Typography>
+                        <Typography variant="body2" className={styles.subtitle}>
+                            Select 1 to 5 locations to generate energy analysis
                         </Typography>
                     </div>
                     
-                    {/* Seleção de mês */}
-                    <div className={styles.monthSection}>
-                        <Select
-                            value={selectedMonth}
-                            onChange={(e) => setSelectedMonth(e.target.value)}
-                            displayEmpty
-                            variant="standard" // Adicionado
-                            disableUnderline // Adicionado
-                            IconComponent={ArrowDropDown} // Opcional: Garante o ícone de dropdown (seta)
-                            MenuProps={{
-                                PaperProps: {
-                                    className: styles.monthDropdownPaper // Nova classe para o Paper
-                                }
-                            }}
-                        >
-                            <MenuItem value="">Select a month</MenuItem>
-                            <MenuItem value="01">January</MenuItem>
-                            <MenuItem value="02">February</MenuItem>
-                            <MenuItem value="03">March</MenuItem>
-                            <MenuItem value="04">April</MenuItem>
-                            <MenuItem value="05">May</MenuItem>
-                            <MenuItem value="06">June</MenuItem>
-                            <MenuItem value="07">July</MenuItem>
-                            <MenuItem value="08">August</MenuItem>
-                            <MenuItem value="09">September</MenuItem>
-                            <MenuItem value="10">October</MenuItem>
-                            <MenuItem value="11">November</MenuItem>
-                            <MenuItem value="12">December</MenuItem>
-                        </Select>
-                    </div>
-                    
-                    {/* Input de cidades expansível */}
-                    <div className={styles.citiesSection}>
-                        <ClickAwayListener onClickAway={handleClickAway}>
-                            <div style={{ position: 'relative' }}>
-                                
-                                {/* Campo de busca fixo no card */}
-                                <div 
-                                    className={styles.searchField}
-                                    onClick={() => setShowDropdown(true)}
+                    {/* Controles à direita */}
+                    <div className={styles.controlsSection}>
+                        <div className={styles.controlsRow}>
+                            {/* Seleção de mês */}
+                            <div className={styles.controlGroup}>
+                                <Select
+                                    value={selectedMonth}
+                                    onChange={(e) => onMonthChange?.(e.target.value)}
+                                    displayEmpty
+                                    variant="outlined"
+                                    size="small"
+                                    className={styles.monthSelect}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            className: styles.dropdownPaper
+                                        }
+                                    }}
                                 >
-                                    <TextField
-                                        size="small"
-                                        placeholder="Busque até 5 locais"
-                                        value={locationQuery}
-                                        onChange={(e) => handleLocationSearch(e.target.value)}
-                                        onFocus={() => setShowDropdown(true)}
-                                        variant="standard"
-                                        InputProps={{
-                                            disableUnderline: true,
-                                            startAdornment: !locationQuery ? (
-                                                <InputAdornment position="start">
-                                                    <Search />
-                                                </InputAdornment>
-                                            ) : null,
-                                            endAdornment: isSearching ? (
-                                                <InputAdornment position="end">
-                                                    <CircularProgress size={14} />
-                                                </InputAdornment>
-                                            ) : null
-                                        }}
-                                    />
-                                </div>
+                                    <MenuItem value="">Select a month</MenuItem>
+                                    <MenuItem value="01">January</MenuItem>
+                                    <MenuItem value="02">February</MenuItem>
+                                    <MenuItem value="03">March</MenuItem>
+                                    <MenuItem value="04">April</MenuItem>
+                                    <MenuItem value="05">May</MenuItem>
+                                    <MenuItem value="06">June</MenuItem>
+                                    <MenuItem value="07">July</MenuItem>
+                                    <MenuItem value="08">August</MenuItem>
+                                    <MenuItem value="09">September</MenuItem>
+                                    <MenuItem value="10">October</MenuItem>
+                                    <MenuItem value="11">November</MenuItem>
+                                    <MenuItem value="12">December</MenuItem>
+                                </Select>
+                            </div>
+                            
+                            {/* Input de cidades */}
+                            <div className={styles.controlGroup}>
+                                <ClickAwayListener onClickAway={handleClickAway}>
+                                    <div className={styles.citiesInputWrapper}>
+                                        <TextField
+                                            size="small"
+                                            placeholder={selectedLocations.length === 5 
+                                                ? "Maximum 5 locations reached" 
+                                                : `Search locations (${selectedLocations.length}/5)`
+                                            }
+                                            value={locationQuery}
+                                            onChange={(e) => handleLocationSearch(e.target.value)}
+                                            onFocus={() => selectedLocations.length < 5 && setShowDropdown(true)}
+                                            variant="outlined"
+                                            className={styles.citiesInput}
+                                            disabled={selectedLocations.length === 5}
+                                            InputProps={{
+                                                startAdornment: (
+                                                    <InputAdornment position="start">
+                                                        <Search className={styles.searchIcon} />
+                                                    </InputAdornment>
+                                                ),
+                                                endAdornment: isSearching ? (
+                                                    <InputAdornment position="end">
+                                                        <CircularProgress size={16} />
+                                                    </InputAdornment>
+                                                ) : selectedLocations.length === 5 ? (
+                                                    <InputAdornment position="end">
+                                                        <Typography variant="caption" color="textSecondary">
+                                                            Max
+                                                        </Typography>
+                                                    </InputAdornment>
+                                                ) : null
+                                            }}
+                                        />
 
-                                {/* Container das cidades selecionadas - aparece abaixo e fora do card */}
-                                {selectedLocations.length > 0 && (
-                                    <div className={styles.selectedCitiesContainer}>
-                                        {/* Chips das cidades selecionadas */}
-                                        {selectedLocations.map((location, index) => (
-                                            <div
-                                                key={`${location.city}-${location.state}-${index}`}
-                                                className={styles.cityChipContainer}
-                                            >
-                                                <Chip
-                                                    label={`${location.city}, ${location.state}`}
-                                                    size="small"
-                                                    onDelete={() => handleLocationRemove(location)}
-                                                />
-                                            </div>
-                                        ))}
-
-                                        {/* Botão para limpar todas as cidades quando há 5 */}
-                                        {selectedLocations.length === 5 && (
-                                            <div className={styles.clearAllButton}>
-                                                <IconButton 
-                                                    size="small" 
-                                                    onClick={handleClearAllLocations}
-                                                >
-                                                    <Close fontSize="small" />
-                                                </IconButton>
+                                        {/* Cidades selecionadas */}
+                                        {selectedLocations.length > 0 && (
+                                            <div className={styles.selectedCitiesContainer}>
+                                                <div className={styles.chipsWrapper}>
+                                                    {selectedLocations.map((location, index) => (
+                                                        <Chip
+                                                            key={`${location.city}-${location.state}-${index}`}
+                                                            label={`${location.city}, ${location.state}`}
+                                                            size="small"
+                                                            onDelete={() => handleLocationRemove(location)}
+                                                            className={styles.locationChip}
+                                                            deleteIcon={<Close className={styles.deleteIcon} />}
+                                                        />
+                                                    ))}
+                                                </div>
+                                                {selectedLocations.length > 0 && (
+                                                    <div className={styles.clearAllSection}>
+                                                        <Button
+                                                            size="small"
+                                                            onClick={handleClearAllLocations}
+                                                            className={styles.clearAllButton}
+                                                        >
+                                                            Clear all ({selectedLocations.length})
+                                                        </Button>
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
+                                        
+                                        {/* Dropdown de resultados */}
+                                        {showDropdown && searchResults.length > 0 && selectedLocations.length < 5 && (
+                                            <Paper className={styles.dropdown}>
+                                                {searchResults.map((location, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className={styles.dropdownItem}
+                                                        onClick={() => handleLocationSelect(location)}
+                                                    >
+                                                        <Typography variant="body2">
+                                                            {`${location.city}, ${location.state}`}
+                                                        </Typography>
+                                                    </div>
+                                                ))}
+                                            </Paper>
+                                        )}
                                     </div>
-                                )}
-                                
-                                {/* Dropdown de resultados da API */}
-                                {showDropdown && searchResults.length > 0 && selectedLocations.length < 5 && (
-                                    <Paper className={styles.dropdown}>
-                                        {searchResults.map((location, index) => (
-                                            <div
-                                                key={index}
-                                                className={styles.dropdownItem}
-                                                onClick={() => handleLocationSelect(location)}
-                                            >
-                                                <Typography variant="body2">
-                                                    {`${location.city}, ${location.state}`}
-                                                </Typography>
-                                            </div>
-                                        ))}
-                                    </Paper>
+                                </ClickAwayListener>
+                            </div>
+                            
+                            {/* Botão de Análise */}
+                            <div className={styles.controlGroup}>
+                                <Button
+                                    variant="contained"
+                                    onClick={() => onAnalyzeClick?.(selectedLocations, selectedMonth)}
+                                    disabled={!isGenerateEnabled}
+                                    className={styles.analyzeButton}
+                                    startIcon={isAnalyzing ? <CircularProgress size={16} /> : <Send />}
+                                >
+                                    {isAnalyzing ? 'Generating...' : 'Generate'}
+                                </Button>
+                                {selectedLocations.length > 0 && (
+                                    <Typography variant="caption" className={styles.locationsCount}>
+                                        {selectedLocations.length} location(s) selected
+                                    </Typography>
                                 )}
                             </div>
-                        </ClickAwayListener>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </Paper>
         </div>
     );
 };

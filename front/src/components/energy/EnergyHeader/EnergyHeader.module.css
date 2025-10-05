@@ -1,310 +1,365 @@
 /* ===== LAYOUT PRINCIPAL E GERAL ===== */
+.container {
+    padding: 0 16px;
+}
+
+/* ===== HEADER SUPERIOR COM LOGO E BOTÃO DE VOLTAR ===== */
+.topHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+}
+
 .logoSection {
-  padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.backButton {
+    color: #666 !important;
+    font-weight: 400 !important;
+    text-transform: none !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 6px 12px !important;
+    background-color: transparent !important;
+    transition: all 0.2s ease !important;
+    font-size: 14px !important;
+}
+
+.backButton:hover {
+    background-color: #f5f5f5 !important;
+    color: #333 !important;
 }
 
 .logoImage {
-  height: 40px;
-  width: auto;
+    height: 35px;
+    width: auto;
 }
 
 .whiteCard {
-  background-color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 24px 32px;
-  border-radius: 8px;
-  margin: 0 16px;
+    background-color: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
 }
 
+/* ===== LAYOUT PRINCIPAL - TÍTULO ESQUERDA, CONTROLES DIREITA ===== */
 .mainRow {
-  display: flex; 
-  justify-content: space-between; 
-  gap: 32px;
-  align-items: center;
-  width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
 }
 
+/* ===== SEÇÃO DO TÍTULO ===== */
 .titleSection {
-  flex-grow: 1; 
+    flex: 1;
+    min-width: 300px;
 }
 
 .title {
-  color: #333;
-  font-weight: bold;
-  font-size: 28px;
-  margin: 0;
+    color: #1a237e;
+    font-weight: 600;
+    font-size: 1.75rem;
+    margin: 0 0 8px 0;
 }
 
-.monthSection {
-  flex-shrink: 0; 
-  width: 180px; 
+.subtitle {
+    color: #666;
+    font-size: 0.9rem;
 }
 
-.citiesSection {
-  flex-shrink: 0; 
-  position: relative;
-  min-width: 250px; 
+/* ===== SEÇÃO DE CONTROLES ===== */
+.controlsSection {
+    flex-shrink: 0;
 }
 
-/* Estilos de INPUT UNIFICADOS (Select de Mês e TextField de Busca) */
-/* Aplica o container com borda azul, altura e padding para ambos */
-.monthSection .MuiInputBase-root,
-.searchField {
-  display: flex; /* Necessário para alinhar Search e CircularProgress */
-  align-items: center;
-  background-color: white !important;
-  border: 2px solid #1976d2 !important; 
-  border-radius: 8px;
-  height: 36px;
-  box-sizing: border-box; /* Garante que a borda não aumente a altura */
-  padding: 0 12px;
-  min-width: 200px;
+.controlsRow {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
 }
 
-.monthSection .MuiInputBase-root:hover,
-.searchField:hover {
-  border-color: #1565c0 !important;
+.controlGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-.monthSection .MuiInputBase-root.Mui-focused,
-.searchField:focus-within {
-  border-color: #0d47a1 !important;
-  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+/* ===== ESTILOS DO SELECT DE MÊS ===== */
+.monthSelect {
+    background-color: white;
+    border-radius: 8px;
+    min-width: 140px;
+    height: 40px;
 }
 
-.monthSection .MuiInputBase-root {
-    width: 100%; /* Ajusta o Select para a largura total do container */
+.monthSelect .MuiOutlinedInput-notchedOutline {
+    border-color: #e0e0e0;
+    border-width: 1px;
 }
 
-/* Remove o sublinhado padrão do Standard variant para ambos (Select e TextField) */
-.monthSection .MuiInput-underline::after,
-.monthSection .MuiInput-underline::before,
-.searchField .MuiInput-underline::after,
-.searchField .MuiInput-underline::before {
-    display: none !important;
+.monthSelect:hover .MuiOutlinedInput-notchedOutline {
+    border-color: #1976d2;
 }
 
-/* Estilo específico para o campo do Select (Mês) */
-.monthSection .MuiSelect-select {
-  padding: 0; 
-  font-size: 14px;
-  color: #333;
-  height: 36px; 
-  display: flex; 
-  align-items: center;
-  font-weight: 500;
+.monthSelect.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #1976d2;
+    border-width: 2px;
 }
 
-.monthSection .MuiSelect-select:focus {
-  background-color: transparent;
+/* ===== ESTILOS DO INPUT DE CIDADES ===== */
+.citiesInputWrapper {
+    position: relative;
+    min-width: 220px;
 }
 
-.monthSection .MuiSelect-icon {
-  color: #1976d2;
-  font-size: 20px;
-  transition: transform 0.2s ease-in-out;
+.citiesInput {
+    width: 100%;
+    background-color: white;
 }
 
-.monthSection .MuiSelect-iconOpen {
-  transform: rotate(180deg);
+.citiesInput .MuiOutlinedInput-root {
+    border-radius: 8px;
+    height: 40px;
 }
 
-.monthDropdownPaper {
-  z-index: 1300;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-radius: 12px;
-  margin-top: 8px;
-  border: 2px solid #1976d2;
-  max-height: 300px;
-  overflow-y: auto;
+.citiesInput .MuiOutlinedInput-notchedOutline {
+    border-color: #e0e0e0;
 }
 
-.monthDropdownPaper .MuiMenuItem-root {
-  padding: 12px 20px;
-  font-size: 14px;
-  color: #333;
-  border-bottom: 1px solid #f0f0f0;
-  transition: all 0.2s ease-in-out;
+.citiesInput:hover .MuiOutlinedInput-notchedOutline {
+    border-color: #1976d2;
 }
 
-.monthDropdownPaper .MuiMenuItem-root:hover {
-  background-color: #e3f2fd;
-  color: #1976d2;
+.citiesInput.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #1976d2;
+    border-width: 2px;
 }
 
-.monthDropdownPaper .MuiMenuItem-root:last-child {
-  border-bottom: none;
+.searchIcon {
+    color: #666;
 }
 
-.monthDropdownPaper .MuiMenuItem-root.Mui-selected {
-  background-color: #bbdefb;
-  color: #1976d2;
-  font-weight: 600;
-}
-
-.monthDropdownPaper .MuiMenuItem-root.Mui-selected:hover {
-  background-color: #90caf9;
-}
-
-/* Estilo específico para o campo do TextField (Cidades) */
-.searchField input {
-  border: none;
-  background: transparent;
-  padding: 0;
-  font-size: 14px;
-  color: #666;
-  flex: 1;
-}
-
-.searchField .MuiInputAdornment-root svg {
-  color: #1976d2;
-  font-size: 18px;
-}
-
-/* ===== CIDADES SELECIONADAS (CHIPS E REMOÇÃO) ===== */
+/* ===== CIDADES SELECIONADAS ===== */
 .selectedCitiesContainer {
-  position: absolute;
-  top: 40px;
-  left: 0;
-  right: 0;
-  background-color: white;
-  border: 1px solid #1976d2;
-  border-radius: 8px;
-  padding: 8px 12px;
-  gap: 4px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  max-height: 200px;
-  overflow-y: auto;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 12px;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: -1px;
 }
 
-.cityChipContainer {
-  display: flex;
-  align-items: center;
-  width: 100%;
+.chipsWrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
 }
 
-.cityChipContainer .MuiChip-root {
-  background-color: #bbdefb !important;
-  color: #1976d2;
-  border-color: #1976d2;
-  height: 32px;
-  font-size: 13px;
-  width: 100%;
-  justify-content: space-between;
-  transition: all 0.2s ease-in-out;
+.locationChip {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    font-weight: 500;
+    border: 1px solid #bbdefb;
+    height: 28px;
 }
 
-.cityChipContainer .MuiChip-label {
-  padding-left: 12px;
-  padding-right: 8px;
-  flex: 1;
-  text-align: left;
+.locationChip:hover {
+    background-color: #bbdefb;
 }
 
-.cityChipContainer .MuiChip-deleteIcon {
-  color: #1976d2;
-  font-size: 18px;
-  margin-left: auto;
-  margin-right: 8px;
+.deleteIcon {
+    font-size: 16px;
+}
+
+.clearAllSection {
+    border-top: 1px solid #f0f0f0;
+    padding-top: 8px;
+    display: flex;
+    justify-content: center;
 }
 
 .clearAllButton {
-  display: flex;
-  justify-content: center;
-  padding-top: 4px;
-  border-top: 1px solid #e0e0e0;
+    color: #666;
+    font-size: 0.75rem;
+    text-transform: none;
+    min-width: auto;
+    padding: 2px 8px;
 }
 
-.clearAllButton .MuiIconButton-root {
-  color: #1976d2;
+.clearAllButton:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+    color: #1976d2;
 }
 
-.clearAllButton .MuiIconButton-root:hover {
-  background-color: rgba(25, 118, 210, 0.1);
-  color: #1565c0;
-}
-
-/* ===== DROPDOWN DE RESULTADOS ===== */
+/* ===== DROPDOWNS ===== */
+.dropdownPaper,
 .dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  max-height: 200px;
-  overflow: auto;
-  margin-top: 4px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    margin-top: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e0e0e0;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 .dropdownItem {
-  padding: 12px;
-  cursor: pointer;
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+    transition: background-color 0.2s;
 }
 
 .dropdownItem:hover {
-  background-color: #f5f5f5;
+    background-color: #f5f5f5;
 }
 
-.dropdownItem:not(:last-child) {
-  border-bottom: 1px solid #eee;
+.dropdownItem:last-child {
+    border-bottom: none;
+}
+
+/* ===== BOTÃO DE ANÁLISE ===== */
+.analyzeButton {
+    background: linear-gradient(135deg, #1976d2, #1565c0);
+    border-radius: 8px;
+    padding: 8px 20px;
+    height: 40px;
+    font-weight: 600;
+    text-transform: none;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.analyzeButton:hover {
+    background: linear-gradient(135deg, #1565c0, #0d47a1);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+    transform: translateY(-1px);
+}
+
+.analyzeButton:disabled {
+    background: #e0e0e0;
+    color: #9e9e9e;
+    box-shadow: none;
+    transform: none;
+}
+
+.locationsCount {
+    text-align: center;
+    color: #666;
+    font-weight: 500;
 }
 
 /* ===== RESPONSIVIDADE ===== */
-@media (max-width: 1200px) {
-  .mainRow {
-    flex-direction: column; 
-    align-items: center;
-    gap: 20px;
-  }
-  
-  .titleSection,
-  .monthSection,
-  .citiesSection {
-    width: 100%; 
-    max-width: 400px; 
-  }
-  
-  .title {
-    font-size: 24px;
-    text-align: center;
-  }
+@media (max-width: 1024px) {
+    .mainRow {
+        gap: 24px;
+    }
+    
+    .controlsRow {
+        gap: 12px;
+    }
+    
+    .citiesInputWrapper {
+        min-width: 200px;
+    }
+    
+    .monthSelect {
+        min-width: 120px;
+    }
 }
 
 @media (max-width: 768px) {
-  .whiteCard {
-    margin: 0 8px;
-    padding: 20px 24px;
-  }
-  
-  .logoSection {
-    padding: 12px 24px;
-  }
-  
-  .mainRow {
-    gap: 16px;
-  }
-  
-  .title {
-    font-size: 18px;
-  }
+    .container {
+        padding: 0 12px;
+    }
+    
+    .topHeader {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+    
+    .logoSection {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .whiteCard {
+        padding: 20px;
+    }
+    
+    .mainRow {
+        flex-direction: column;
+        gap: 20px;
+        align-items: stretch;
+    }
+    
+    .titleSection {
+        text-align: center;
+        min-width: auto;
+    }
+    
+    .controlsSection {
+        width: 100%;
+    }
+    
+    .controlsRow {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .title {
+        font-size: 1.5rem;
+    }
 }
 
 @media (max-width: 480px) {
-  .whiteCard {
-    margin: 0 4px;
-    padding: 16px 20px;
-  }
-  
-  .logoSection {
-    padding: 8px 20px;
-  }
-  
-  .title {
-    font-size: 16px;
-  }
+    .container {
+        padding: 0 8px;
+    }
+    
+    .logoSection {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    
+    .backButton {
+        align-self: stretch;
+        text-align: center;
+    }
+    
+    .whiteCard {
+        padding: 16px;
+    }
+    
+    .logoImage {
+        height: 30px;
+        align-self: center;
+    }
+    
+    .title {
+        font-size: 1.25rem;
+    }
+    
+    .controlsRow {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .citiesInputWrapper {
+        min-width: auto;
+    }
 }

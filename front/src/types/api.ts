@@ -98,6 +98,68 @@ export interface WeatherClassifications {
   very_wet_wind_threshold: number;
 }
 
+// Tipos para a API de energia
+export interface MonthlyEnergyData {
+  JAN: number;
+  FEB: number;
+  MAR: number;
+  APR: number;
+  MAY: number;
+  JUN: number;
+  JUL: number;
+  AUG: number;
+  SEP: number;
+  OCT: number;
+  NOV: number;
+  DEC: number;
+  ANN: number;
+}
+
+export interface ClimateEnergyPotential {
+  solar_kwh_per_m2: MonthlyEnergyData;
+  wind_kwh_per_m2: MonthlyEnergyData;
+}
+
+export interface RawNasaMetrics {
+  SolarIrradianceOptimal: MonthlyEnergyData;
+  SolarIrradianceOptimalAngle: MonthlyEnergyData;
+  SurfaceAirDensity: MonthlyEnergyData;
+  WindSpeed50m: MonthlyEnergyData;
+  WindDirection50m: MonthlyEnergyData;
+}
+
+export interface EnergyLocation {
+  latitude: number;
+  longitude: number;
+}
+
+export interface EnergyResponse {
+  location: EnergyLocation;
+  climate_energy_potential: ClimateEnergyPotential;
+  raw_nasa_metrics_monthly: RawNasaMetrics;
+}
+
+export interface EnergyRequest {
+  latitude: number;
+  longitude: number;
+}
+
+// Tipos processados para usar nos componentes
+export interface ProcessedCityEnergyData {
+  cityName: string;
+  location: EnergyLocation;
+  solarAnnual: number;
+  windAnnual: number;
+  solarMonthly: MonthlyEnergyData;
+  windMonthly: MonthlyEnergyData;
+  indicators: {
+    solarIrradiance: number;
+    optimalAngle: number;
+    airDensity: number;
+    windSpeed: number;
+  };
+}
+
 export interface WeatherMeta {
   latitude: number;
   longitude: number;

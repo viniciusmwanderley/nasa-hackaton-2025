@@ -24,7 +24,7 @@ const CityRanking: React.FC<CityRankingProps> = ({ energyType }) => {
 
     const cities = energyType === 'solar' ? solarCities : eolicaCities;
     const color = energyType === 'solar' ? '#ff9500' : '#007bff';
-    const energyLabel = energyType === 'solar' ? 'energia solar' : 'energia eólica';
+    const energyLabel = energyType === 'solar' ? 'solar power' : 'wind power';
 
     return (
         <div className="city-ranking">

@@ -45,9 +45,123 @@
     font-size: 24px !important;
 }
 
+/* ===== ESTILOS MELHORADOS DO SELETOR DE CIDADE ===== */
 .citySelector {
-    min-width: 220px;
+    min-width: 280px;
 }
+
+.citySelectorLabel {
+    font-weight: 600 !important;
+    color: #333 !important;
+    font-size: 14px !important;
+    background: white !important;
+    padding: 0 8px !important;
+    margin-left: -4px !important;
+}
+
+.citySelect {
+    background-color: white;
+    border-radius: 8px !important;
+    height: 48px;
+}
+
+.citySelect .MuiOutlinedInput-notchedOutline {
+    border: 2px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+}
+
+.citySelect:hover .MuiOutlinedInput-notchedOutline {
+    border-color: #1976d2 !important;
+}
+
+.citySelect.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #1976d2 !important;
+    border-width: 2px !important;
+}
+
+.citySelect .MuiSelect-select {
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: #333 !important;
+}
+
+.citySelect .MuiSvgIcon-root {
+    color: #1976d2 !important;
+    font-size: 20px !important;
+}
+
+/* Texto "Waiting For Cities" */
+.waitingText {
+    color: #666 !important;
+    font-style: italic !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+}
+
+/* Dropdown estilizado */
+.cityDropdownPaper {
+    border-radius: 8px !important;
+    margin-top: 8px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid #e0e0e0 !important;
+}
+
+.cityMenuItem {
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+    border-bottom: 1px solid #f5f5f5 !important;
+    transition: all 0.2s ease !important;
+}
+
+.cityMenuItem:hover {
+    background-color: #f0f7ff !important;
+    color: #1976d2 !important;
+}
+
+.cityMenuItem:last-child {
+    border-bottom: none !important;
+}
+
+.cityMenuItem.Mui-selected {
+    background-color: #e3f2fd !important;
+    color: #1976d2 !important;
+    font-weight: 600 !important;
+}
+
+.cityMenuItem.Mui-selected:hover {
+    background-color: #bbdefb !important;
+}
+
+/* Mensagem de espera no dropdown */
+.waitingMenuItem {
+    opacity: 0.7 !important;
+    cursor: not-allowed !important;
+}
+
+.waitingMessage {
+    color: #666 !important;
+    font-style: italic !important;
+    text-align: center !important;
+    width: 100% !important;
+    font-size: 13px !important;
+}
+
+/* Estado quando não há cidades */
+.citySelect:disabled {
+    background-color: #f9f9f9 !important;
+}
+
+.citySelect:disabled .MuiOutlinedInput-notchedOutline {
+    border-color: #e0e0e0 !important;
+    background-color: #f9f9f9 !important;
+}
+
+.citySelect:disabled .MuiSvgIcon-root {
+    color: #ccc !important;
+}
+
+/* ===== FIM DOS ESTILOS DO SELETOR ===== */
 
 /* Layout para os indicadores em linha */
 .indicatorsRowContainer {
@@ -98,7 +212,6 @@
     border: none !important;
 }
 
-/* --- MODIFICADO: Título no topo, valor centralizado --- */
 .cardContent {
     height: 100%;
     padding: 30px !important;
@@ -152,15 +265,13 @@
     z-index: 1;
 }
 
-
-/* --- MODIFICADO: Estilos da seção de informações (Direita) --- */
-
+/* Estilos da seção de informações (Direita) */
 .infoCard {
-    border-radius: 16px !important; /* Bordas mais arredondadas */
+    border-radius: 16px !important;
     border: none !important;
     box-shadow: none !important;
-    padding: 8px !important; /* Padding interno aumentado */
-    flex: 1; /* Ocupa espaço disponível */
+    padding: 8px !important;
+    flex: 1;
     display: flex !important;
     flex-direction: column !important;
 }
@@ -190,18 +301,17 @@
 
 /* Estilos de fonte para os títulos e descrições dos cards de info */
 .infoCardTitle {
-    font-weight: 700 !important; /* Peso Bold */
+    font-weight: 700 !important;
     font-size: 18px !important;
     margin-bottom: 10px !important;
     line-height: 1.4 !important;
 }
 
 .infoCardDescription {
-    font-weight: 500 !important; /* Peso Regular */
+    font-weight: 500 !important;
     font-size: 14px !important;
     line-height: 1.6 !important;
 }
-
 
 /* Responsividade */
 @media (max-width: 1200px) {
@@ -223,6 +333,10 @@
     
     .indicatorsRowContainer {
         gap: 16px;
+    }
+    
+    .citySelector {
+        min-width: 250px;
     }
 }
 
@@ -250,6 +364,10 @@
     .citySelector {
         min-width: auto;
         width: 100%;
+    }
+    
+    .citySelect {
+        height: 44px;
     }
     
     .indicatorsRowContainer {
@@ -318,6 +436,19 @@
     
     .title {
         font-size: 18px !important;
+    }
+    
+    .citySelect {
+        height: 42px;
+    }
+    
+    .citySelect .MuiSelect-select {
+        padding: 10px 14px !important;
+        font-size: 13px !important;
+    }
+    
+    .waitingText {
+        font-size: 13px !important;
     }
     
     .indicatorsRowContainer {

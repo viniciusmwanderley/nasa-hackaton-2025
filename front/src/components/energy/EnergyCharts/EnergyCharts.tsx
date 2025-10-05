@@ -3,83 +3,108 @@ import {
     Box,
     Typography,
     Paper,
-    Select,
-    MenuItem,
-    FormControl,
-    InputLabel,
     Chip,
-    Container
+    Container,
+    Alert
 } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import styles from './EnergyCharts.module.css';
+import { ChartSkeleton, RankingSkeleton } from '../../common/ChartSkeleton';
+
+import type { ProcessedCityEnergyData } from '../../../types/api';
 
 interface EnergyChartsProps {
     selectedMonth?: string;
     onMonthChange?: (month: string) => void;
+    energyData?: ProcessedCityEnergyData[];
+    loading?: boolean;
+    error?: string | null;
 }
 
 const EnergyCharts: React.FC<EnergyChartsProps> = ({ 
-    }) => {
-    // Mock data baseado na captura de tela
-    const solarData = [
-        { city: 'São Paulo', shortName: 'SP', value: 142 },
-        { city: 'Rio de Janeiro', shortName: 'RJ', value: 165 },
-        { city: 'Belo Horizonte', shortName: 'BH', value: 178 },
-        { city: 'Salvador', shortName: 'SSA', value: 195 },
-        { city: 'Fortaleza', shortName: 'FOR', value: 210 },
-        { city: 'Recife', shortName: 'REC', value: 188 },
-        { city: 'Brasília', shortName: 'BSB', value: 185 },
-        { city: 'Curitiba', shortName: 'CWB', value: 135 },
-        { city: 'Porto Alegre', shortName: 'POA', value: 128 },
-        { city: 'Manaus', shortName: 'MAO', value: 155 }
-    ];
+    energyData = [],
+    loading = false,
+    error = null,
+    selectedMonth = '01'
+}) => {
+    // Mapeamento mês número para chave da API
+    const monthKeys = {
+        '01': 'JAN', '02': 'FEB', '03': 'MAR', '04': 'APR',
+        '05': 'MAY', '06': 'JUN', '07': 'JUL', '08': 'AUG',
+        '09': 'SEP', '10': 'OCT', '11': 'NOV', '12': 'DEC',
+        'ANN': 'ANN'
+    } as const;
 
-    const windData = [
-        { city: 'São Paulo', shortName: 'SP', value: 85 },
-        { city: 'Rio de Janeiro', shortName: 'RJ', value: 102 },
-        { city: 'Belo Horizonte', shortName: 'BH', value: 78 },
-        { city: 'Salvador', shortName: 'SSA', value: 145 },
-        { city: 'Fortaleza', shortName: 'FOR', value: 198 },
-        { city: 'Recife', shortName: 'REC', value: 165 },
-        { city: 'Brasília', shortName: 'BSB', value: 92 },
-        { city: 'Curitiba', shortName: 'CWB', value: 115 },
-        { city: 'Porto Alegre', shortName: 'POA', value: 134 },
-        { city: 'Manaus', shortName: 'MAO', value: 68 }
-    ];
+    const currentMonthKey = monthKeys[selectedMonth as keyof typeof monthKeys] || 'ANN';
+    const isAnnual = currentMonthKey === 'ANN';
 
-    const solarRanking = [
-        { position: 1, city: 'Fortaleza', value: '210 kWh/m²' },
-        { position: 2, city: 'Salvador', value: '195 kWh/m²' },
-        { position: 3, city: 'Recife', value: '188 kWh/m²' },
-        { position: 4, city: 'Brasília', value: '185 kWh/m²' },
-        { position: 5, city: 'Belo Horizonte', value: '178 kWh/m²' }
-    ];
+    // Função para gerar nome curto da cidade
+    const generateShortName = (cityName: string): string => {
+        const parts = cityName.split(',')[0].trim();
+        const words = parts.split(' ');
+        if (words.length === 1) {
+            return words[0].substring(0, 3).toUpperCase();
+        } else {
+            return words.map(word => word[0]).join('').toUpperCase().substring(0, 3);
+        }
+    };
 
-    const windRanking = [
-        { position: 1, city: 'Fortaleza', value: '198 kWh/m²' },
-        { position: 2, city: 'Recife', value: '165 kWh/m²' },
-        { position: 3, city: 'Salvador', value: '145 kWh/m²' },
-        { position: 4, city: 'Porto Alegre', value: '134 kWh/m²' },
-        { position: 5, city: 'Curitiba', value: '115 kWh/m²' }
-    ];
+    // Processa dados solares para o gráfico
+    const solarData = energyData.length > 0 ? energyData.map(city => ({
+        city: city.cityName,
+        shortName: generateShortName(city.cityName),
+        value: isAnnual ? 
+            Math.round(city.solarAnnual) : 
+            Math.round(city.solarMonthly[currentMonthKey])
+    })) : [];
 
-    const months = [
-        { value: 'janeiro', label: 'Janeiro' },
-        { value: 'fevereiro', label: 'Fevereiro' },
-        { value: 'marco', label: 'Março' },
-        { value: 'abril', label: 'Abril' },
-        { value: 'maio', label: 'Maio' },
-        { value: 'junho', label: 'Junho' },
-        { value: 'julho', label: 'Julho' },
-        { value: 'agosto', label: 'Agosto' },
-        { value: 'setembro', label: 'Setembro' },
-        { value: 'outubro', label: 'Outubro' },
-        { value: 'novembro', label: 'Novembro' },
-        { value: 'dezembro', label: 'Dezembro' }
-    ];
+    // Processa dados eólicos para o gráfico
+    const windData = energyData.length > 0 ? energyData.map(city => ({
+        city: city.cityName,
+        shortName: generateShortName(city.cityName),
+        value: isAnnual ? 
+            Math.round(city.windAnnual) : 
+            Math.round(city.windMonthly[currentMonthKey])
+    })) : [];
+
+    // Cria ranking solar ordenado
+    const solarRanking = energyData.length > 0 ? 
+        [...energyData]
+            .sort((a, b) => {
+                const valueA = isAnnual ? a.solarAnnual : a.solarMonthly[currentMonthKey];
+                const valueB = isAnnual ? b.solarAnnual : b.solarMonthly[currentMonthKey];
+                return valueB - valueA;
+            })
+            .slice(0, 5)
+            .map((city, index) => ({
+                position: index + 1,
+                city: city.cityName,
+                value: `${Math.round(isAnnual ? city.solarAnnual : city.solarMonthly[currentMonthKey])} kWh/m²`
+            })) : [];
+
+    // Cria ranking eólico ordenado
+    const windRanking = energyData.length > 0 ? 
+        [...energyData]
+            .sort((a, b) => {
+                const valueA = isAnnual ? a.windAnnual : a.windMonthly[currentMonthKey];
+                const valueB = isAnnual ? b.windAnnual : b.windMonthly[currentMonthKey];
+                return valueB - valueA;
+            })
+            .slice(0, 5)
+            .map((city, index) => ({
+                position: index + 1,
+                city: city.cityName,
+                value: `${Math.round(isAnnual ? city.windAnnual : city.windMonthly[currentMonthKey])} kWh/m²`
+            })) : [];
 
     return (
         <Container maxWidth="xl" sx={{ px: 4 }}>
+            {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                    {error}
+                </Alert>
+            )}
+            
             {/* Seletor de Mês */}
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
             </Box>
@@ -95,222 +120,268 @@ const EnergyCharts: React.FC<EnergyChartsProps> = ({
             }}>
                 {/* Gráfico Energia Solar */}
                 <Box sx={{ flex: '3', minWidth: '0' }}>
-                    <Paper sx={{ 
-                        p: 2.5, 
-                        height: '450px',
-                        boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-                        borderRadius: 2,
-                        border: '1px solid #f0f0f0'
-                    }}>
-                        <Typography variant="h6" sx={{ 
-                            mb: 2, 
-                            color: '#333', 
-                            fontWeight: 'bold',
-                            fontSize: '16px',
-                            lineHeight: 1.3
+                    {loading ? (
+                        <ChartSkeleton />
+                    ) : (
+                        <Paper sx={{ 
+                            p: 2.5, 
+                            height: '450px',
+                            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                            borderRadius: 2,
+                            border: '1px solid #f0f0f0'
                         }}>
-                            Estimativa mensal Geração de energia solar
-                        </Typography>
-                        <Box sx={{ height: 380 }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart 
-                                    data={solarData} 
-                                    margin={{ top: 10, right: 15, left: 15, bottom: 40 }}
-                                >
-                                    <XAxis 
-                                        dataKey="shortName" 
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fontSize: 10, fill: '#666' }}
-                                        angle={-45}
-                                        textAnchor="end"
-                                        height={50}
-                                        interval={0}
-                                    />
-                                    <YAxis 
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fontSize: 10, fill: '#666' }}
-                                        width={35}
-                                    />
-                                    <Tooltip 
-                                        formatter={(value: number) => [`${value} kWh/m²`]}
-                                        labelFormatter={(label) => {
-                                            const cityData = solarData.find(item => item.shortName === label);
-                                            return cityData ? cityData.city : label;
-                                        }}
-                                        contentStyle={{
-                                            backgroundColor: 'white',
-                                            border: '1px solid #e0e0e0',
-                                            borderRadius: '8px',
-                                            color: '#333',
-                                            fontSize: '12px',
-                                            padding: '8px 12px',
-                                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                                        }}
-                                    />
-                                    <Bar 
-                                        dataKey="value" 
-                                        radius={[6, 6, 0, 0]}
+                            <Typography variant="h6" sx={{ 
+                                mb: 2, 
+                                color: '#333', 
+                                fontWeight: 'bold',
+                                fontSize: '16px',
+                                lineHeight: 1.3
+                            }}>
+                                Monthly Solar Potential Estimate
+                            </Typography>
+                            <Box sx={{ height: 380 }}>
+                                {solarData.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart 
+                                        data={solarData} 
+                                        margin={{ top: 10, right: 15, left: 15, bottom: 40 }}
                                     >
-                                        {solarData.map((_, index) => (
-                                            <Cell key={`cell-${index}`} fill="#FF9800" />
-                                        ))}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </Box>
-                    </Paper>
+                                        <XAxis 
+                                            dataKey="shortName" 
+                                            axisLine={false}
+                                            tickLine={false}
+                                            tick={{ fontSize: 10, fill: '#666' }}
+                                            angle={-45}
+                                            textAnchor="end"
+                                            height={50}
+                                            interval={0}
+                                        />
+                                        <YAxis 
+                                            axisLine={false}
+                                            tickLine={false}
+                                            tick={{ fontSize: 10, fill: '#666' }}
+                                            width={35}
+                                        />
+                                        <Tooltip 
+                                            formatter={(value: number) => [`${value} kWh/m²`]}
+                                            labelFormatter={(label) => {
+                                                const cityData = solarData.find(item => item.shortName === label);
+                                                return cityData ? cityData.city : label;
+                                            }}
+                                            contentStyle={{
+                                                backgroundColor: 'white',
+                                                border: '1px solid #e0e0e0',
+                                                borderRadius: '8px',
+                                                color: '#333',
+                                                fontSize: '12px',
+                                                padding: '8px 12px',
+                                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                                            }}
+                                        />
+                                        <Bar 
+                                            dataKey="value" 
+                                            radius={[6, 6, 0, 0]}
+                                        >
+                                            {solarData.map((_, index) => (
+                                                <Cell key={`cell-${index}`} fill="#FF9800" />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Select cities in the search field above to view the data
+                                    </Typography>
+                                </Box>
+                                )}
+                            </Box>
+                        </Paper>
+                    )}
                 </Box>
 
                 {/* Ranking Energia Solar */}
                 <Box sx={{ flex: '2', minWidth: '0' }}>
-                    <Paper sx={{ 
-                        p: 3, 
-                        height: '450px',
-                        boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-                        borderRadius: 2,
-                        border: '1px solid #f0f0f0'
-                    }}>
-                        <Typography variant="subtitle1" sx={{ 
-                            mb: 2.5, 
-                            fontWeight: 'bold', 
-                            fontSize: '15px', 
-                            textAlign: 'center',
-                            lineHeight: 1.4,
-                            color: '#333'
+                    {loading ? (
+                        <RankingSkeleton />
+                    ) : (
+                        <Paper sx={{ 
+                            p: 3, 
+                            height: '450px',
+                            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                            borderRadius: 2,
+                            border: '1px solid #f0f0f0'
                         }}>
-                            Cidades com maior<br />potencial para produção de<br />
-                            <span style={{ color: '#FF9800', fontWeight: 'bold' }}>energia solar</span>
-                        </Typography>
-                        <div className={styles.rankingContainer}>
-                            {solarRanking.map((item) => (
-                                <div key={item.position} className={`${styles.rankingItem} ${styles.solarRankingItem}`}>
-                                    <Chip 
-                                        label={item.position + 'º'} 
-                                        size="small" 
-                                        className={`${styles.rankingChip} ${styles.solarChip}`}
-                                    />
-                                    <div className={styles.rankingCityName}>
-                                        {item.city}
+                            <Typography variant="subtitle1" sx={{ 
+                                mb: 2.5, 
+                                fontWeight: 'bold', 
+                                fontSize: '15px', 
+                                textAlign: 'center',
+                                lineHeight: 1.4,
+                                color: '#333'
+                            }}>
+                               Cities with the Highest <span style={{ color: '#FF9800', fontWeight: 'bold' }}>Solar Power</span> Potential
+                            </Typography>
+                            <div className={styles.rankingContainer}>
+                                {solarRanking.length > 0 ? (
+                                solarRanking.map((item) => (
+                                    <div key={item.position} className={`${styles.rankingItem} ${styles.solarRankingItem}`}>
+                                        <Chip 
+                                            label={item.position + 'º'} 
+                                            size="small" 
+                                            className={`${styles.rankingChip} ${styles.solarChip}`}
+                                        />
+                                        <div className={styles.rankingCityName}>
+                                            {item.city}
+                                        </div>
+                                        <div className={`${styles.rankingValue} ${styles.solarValue}`}>
+                                            {item.value}
+                                        </div>
                                     </div>
-                                    <div className={`${styles.rankingValue} ${styles.solarValue}`}>
-                                        {item.value}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </Paper>
+                                ))
+                            ) : (
+                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}>
+                                    <Typography variant="body2" color="text.secondary" textAlign="center">
+                                        Select cities to see the ranking
+                                    </Typography>
+                                </Box>
+                                )}
+                            </div>
+                        </Paper>
+                    )}
                 </Box>
 
                 {/* Gráfico Energia Eólica */}
                 <Box sx={{ flex: '3', minWidth: '0' }}>
-                    <Paper sx={{ 
-                        p: 2.5, 
-                        height: '450px',
-                        boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-                        borderRadius: 2,
-                        border: '1px solid #f0f0f0'
-                    }}>
-                        <Typography variant="h6" sx={{ 
-                            mb: 2, 
-                            color: '#333', 
-                            fontWeight: 'bold',
-                            fontSize: '16px',
-                            lineHeight: 1.3
+                    {loading ? (
+                        <ChartSkeleton />
+                    ) : (
+                        <Paper sx={{ 
+                            p: 2.5, 
+                            height: '450px',
+                            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                            borderRadius: 2,
+                            border: '1px solid #f0f0f0'
                         }}>
-                            Estimativa mensal Geração de energia eólica
-                        </Typography>
-                        <Box sx={{ height: 380 }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart 
-                                    data={windData} 
-                                    margin={{ top: 10, right: 15, left: 15, bottom: 40 }}
-                                >
-                                    <XAxis 
-                                        dataKey="shortName" 
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fontSize: 10, fill: '#666' }}
-                                        angle={-45}
-                                        textAnchor="end"
-                                        height={50}
-                                        interval={0}
-                                    />
-                                    <YAxis 
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fontSize: 10, fill: '#666' }}
-                                        width={35}
-                                    />
-                                    <Tooltip 
-                                        formatter={(value: number) => [`${value} kWh/m²`]}
-                                        labelFormatter={(label) => {
-                                            const cityData = windData.find(item => item.shortName === label);
-                                            return cityData ? cityData.city : label;
-                                        }}
-                                        contentStyle={{
-                                            backgroundColor: 'white',
-                                            border: '1px solid #e0e0e0',
-                                            borderRadius: '8px',
-                                            color: '#333',
-                                            fontSize: '12px',
-                                            padding: '8px 12px',
-                                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                                        }}
-                                    />
-                                    <Bar 
-                                        dataKey="value" 
-                                        radius={[6, 6, 0, 0]}
+                            <Typography variant="h6" sx={{ 
+                                mb: 2, 
+                                color: '#333', 
+                                fontWeight: 'bold',
+                                fontSize: '16px',
+                                lineHeight: 1.3
+                            }}>
+                                Monthly Wind Potential Estimate
+                            </Typography>
+                            <Box sx={{ height: 380 }}>
+                                {windData.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart 
+                                        data={windData} 
+                                        margin={{ top: 10, right: 15, left: 15, bottom: 40 }}
                                     >
-                                        {windData.map((_, index) => (
-                                            <Cell key={`cell-${index}`} fill="#2196F3" />
-                                        ))}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </Box>
-                    </Paper>
+                                        <XAxis 
+                                            dataKey="shortName" 
+                                            axisLine={false}
+                                            tickLine={false}
+                                            tick={{ fontSize: 10, fill: '#666' }}
+                                            angle={-45}
+                                            textAnchor="end"
+                                            height={50}
+                                            interval={0}
+                                        />
+                                        <YAxis 
+                                            axisLine={false}
+                                            tickLine={false}
+                                            tick={{ fontSize: 10, fill: '#666' }}
+                                            width={35}
+                                        />
+                                        <Tooltip 
+                                            formatter={(value: number) => [`${value} kWh/m²`]}
+                                            labelFormatter={(label) => {
+                                                const cityData = windData.find(item => item.shortName === label);
+                                                return cityData ? cityData.city : label;
+                                            }}
+                                            contentStyle={{
+                                                backgroundColor: 'white',
+                                                border: '1px solid #e0e0e0',
+                                                borderRadius: '8px',
+                                                color: '#333',
+                                                fontSize: '12px',
+                                                padding: '8px 12px',
+                                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                                            }}
+                                        />
+                                        <Bar 
+                                            dataKey="value" 
+                                            radius={[6, 6, 0, 0]}
+                                        >
+                                            {windData.map((_, index) => (
+                                                <Cell key={`cell-${index}`} fill="#2196F3" />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Select cities in the search field above to view the data
+                                    </Typography>
+                                </Box>
+                                )}
+                            </Box>
+                        </Paper>
+                    )}
                 </Box>
 
                 {/* Ranking Energia Eólica */}
                 <Box sx={{ flex: '2', minWidth: '0' }}>
-                    <Paper sx={{ 
-                        p: 3, 
-                        height: '450px',
-                        boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-                        borderRadius: 2,
-                        border: '1px solid #f0f0f0'
-                    }}>
-                        <Typography variant="subtitle1" sx={{ 
-                            mb: 2.5, 
-                            fontWeight: 'bold', 
-                            fontSize: '15px', 
-                            textAlign: 'center',
-                            lineHeight: 1.4,
-                            color: '#333'
+                    {loading ? (
+                        <RankingSkeleton />
+                    ) : (
+                        <Paper sx={{ 
+                            p: 3, 
+                            height: '450px',
+                            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                            borderRadius: 2,
+                            border: '1px solid #f0f0f0'
                         }}>
-                            Cidades com maior<br />potencial para produção de<br />
-                            <span style={{ color: '#2196F3', fontWeight: 'bold' }}>energia eólica</span>
-                        </Typography>
-                        <div className={styles.rankingContainer}>
-                            {windRanking.map((item) => (
-                                <div key={item.position} className={`${styles.rankingItem} ${styles.windRankingItem}`}>
-                                    <Chip 
-                                        label={item.position + 'º'} 
-                                        size="small" 
-                                        className={`${styles.rankingChip} ${styles.windChip}`}
-                                    />
-                                    <div className={styles.rankingCityName}>
-                                        {item.city}
+                            <Typography variant="subtitle1" sx={{ 
+                                mb: 2.5, 
+                                fontWeight: 'bold', 
+                                fontSize: '15px', 
+                                textAlign: 'center',
+                                lineHeight: 1.4,
+                                color: '#333'
+                            }}>
+                                Cities with the Highest <span style={{ color: '#2196F3', fontWeight: 'bold' }}>Wind Power Generation</span> Potential
+                            </Typography>
+                            <div className={styles.rankingContainer}>
+                                {windRanking.length > 0 ? (
+                                windRanking.map((item) => (
+                                    <div key={item.position} className={`${styles.rankingItem} ${styles.windRankingItem}`}>
+                                        <Chip 
+                                            label={item.position + 'º'} 
+                                            size="small" 
+                                            className={`${styles.rankingChip} ${styles.windChip}`}
+                                        />
+                                        <div className={styles.rankingCityName}>
+                                            {item.city}
+                                        </div>
+                                        <div className={`${styles.rankingValue} ${styles.windValue}`}>
+                                            {item.value}
+                                        </div>
                                     </div>
-                                    <div className={`${styles.rankingValue} ${styles.windValue}`}>
-                                        {item.value}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </Paper>
+                                ))
+                            ) : (
+                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}>
+                                    <Typography variant="body2" color="text.secondary" textAlign="center">
+                                        Select cities to see the ranking
+                                    </Typography>
+                                </Box>
+                                )}
+                            </div>
+                        </Paper>
+                    )}
                 </Box>
             </Box>
         </Container>
