@@ -5,7 +5,7 @@ const OPENWEATHER_API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
 
 // Busca cidade -> coordenadas usando API de geocodificação do OpenWeather
 export const geocodeLocation = async (query: string): Promise<Location[]> => {
-  const url = `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=1&appid=${OPENWEATHER_API_KEY}`;
+  const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=1&appid=${OPENWEATHER_API_KEY}`;
 
   try {
     const response = await fetch(url);
