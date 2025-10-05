@@ -1,42 +1,259 @@
-/* EnergyHeader.module.css */
-.searchContainer {
-    position: relative;
-    width: 280px;
+/* ===== LAYOUT PRINCIPAL E GERAL ===== */
+.logoSection {
+  padding: 16px 32px;
 }
 
-.searchResults {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    max-height: 200px;
-    overflow: auto;
-    margin-top: 4px;
+.logoImage {
+  height: 40px;
+  width: auto;
 }
 
-.searchResultItem {
-    padding: 12px;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
+.whiteCard {
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 24px 32px;
+  border-radius: 8px;
+  margin: 0 16px;
 }
 
-.searchResultItem:hover {
-    background-color: #f5f5f5;
+.mainRow {
+  display: flex; 
+  justify-content: space-between; 
+  gap: 32px;
+  align-items: center;
+  width: 100%;
 }
 
-.selectedLocations {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    z-index: 999;
-    margin-top: 4px;
+.titleSection {
+  flex-grow: 1; 
 }
 
-.locationsContainer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    padding: 8px;
+.title {
+  color: #333;
+  font-weight: bold;
+  font-size: 28px;
+  margin: 0;
+}
+
+.monthSection {
+  flex-shrink: 0; 
+  width: 180px; 
+}
+
+.citiesSection {
+  flex-shrink: 0; 
+  position: relative;
+  min-width: 250px; 
+}
+
+/* Estilos de INPUT UNIFICADOS (Select de Mês e TextField de Busca) */
+/* Aplica o container com borda azul, altura e padding para ambos */
+.monthSection .MuiInputBase-root,
+.searchField {
+  display: flex; /* Necessário para alinhar Search e CircularProgress */
+  align-items: center;
+  background-color: white;
+  border: 1px solid #1976d2; 
+  border-radius: 8px;
+  height: 36px;
+  box-sizing: border-box; /* Garante que a borda não aumente a altura */
+  padding: 0 12px;
+  min-width: 200px;
+}
+
+.monthSection .MuiInputBase-root {
+    width: 100%; /* Ajusta o Select para a largura total do container */
+}
+
+/* Remove o sublinhado padrão do Standard variant para ambos (Select e TextField) */
+.monthSection .MuiInput-underline::after,
+.monthSection .MuiInput-underline::before,
+.searchField .MuiInput-underline::after,
+.searchField .MuiInput-underline::before {
+    display: none !important;
+}
+
+/* Estilo específico para o campo do Select (Mês) */
+.monthSection .MuiSelect-select {
+  padding: 0; 
+  font-size: 14px;
+  color: #666;
+  height: 36px; 
+  display: flex; 
+  align-items: center;
+}
+
+.monthSection .MuiSelect-icon {
+  color: #1976d2;
+  font-size: 20px;
+}
+
+.monthDropdownPaper {
+  z-index: 1300;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  margin-top: 4px;
+}
+
+/* Estilo específico para o campo do TextField (Cidades) */
+.searchField input {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 14px;
+  color: #666;
+  flex: 1;
+}
+
+.searchField .MuiInputAdornment-root svg {
+  color: #1976d2;
+  font-size: 18px;
+}
+
+/* ===== CIDADES SELECIONADAS (CHIPS E REMOÇÃO) ===== */
+.selectedCitiesContainer {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #1976d2;
+  border-radius: 8px;
+  padding: 8px 12px;
+  gap: 4px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.cityChipContainer {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.cityChipContainer .MuiChip-root {
+  background-color: #bbdefb !important;
+  color: #1976d2;
+  border-color: #1976d2;
+  height: 32px;
+  font-size: 13px;
+  width: 100%;
+  justify-content: space-between;
+  transition: all 0.2s ease-in-out;
+}
+
+.cityChipContainer .MuiChip-label {
+  padding-left: 12px;
+  padding-right: 8px;
+  flex: 1;
+  text-align: left;
+}
+
+.cityChipContainer .MuiChip-deleteIcon {
+  color: #1976d2;
+  font-size: 18px;
+  margin-left: auto;
+  margin-right: 8px;
+}
+
+.clearAllButton {
+  display: flex;
+  justify-content: center;
+  padding-top: 4px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.clearAllButton .MuiIconButton-root {
+  color: #1976d2;
+}
+
+.clearAllButton .MuiIconButton-root:hover {
+  background-color: rgba(25, 118, 210, 0.1);
+  color: #1565c0;
+}
+
+/* ===== DROPDOWN DE RESULTADOS ===== */
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  max-height: 200px;
+  overflow: auto;
+  margin-top: 4px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dropdownItem {
+  padding: 12px;
+  cursor: pointer;
+}
+
+.dropdownItem:hover {
+  background-color: #f5f5f5;
+}
+
+.dropdownItem:not(:last-child) {
+  border-bottom: 1px solid #eee;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 1200px) {
+  .mainRow {
+    flex-direction: column; 
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .titleSection,
+  .monthSection,
+  .citiesSection {
+    width: 100%; 
+    max-width: 400px; 
+  }
+  
+  .title {
+    font-size: 24px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .whiteCard {
+    margin: 0 8px;
+    padding: 20px 24px;
+  }
+  
+  .logoSection {
+    padding: 12px 24px;
+  }
+  
+  .mainRow {
+    gap: 16px;
+  }
+  
+  .title {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .whiteCard {
+    margin: 0 4px;
+    padding: 16px 20px;
+  }
+  
+  .logoSection {
+    padding: 8px 20px;
+  }
+  
+  .title {
+    font-size: 16px;
+  }
 }

@@ -1,29 +1,36 @@
 import React, { useState, useCallback } from 'react';
 import {
-    Box,
     Typography,
     Paper,
-    AppBar,
-    Toolbar,
     TextField,
     InputAdornment,
     CircularProgress,
-    Chip
+    Chip,
+    ClickAwayListener,
+    Select,
+    MenuItem,
+    IconButton
 } from '@mui/material';
-import { Search } from '@mui/icons-material';
+import { Search, Close, ArrowDropDown } from '@mui/icons-material';
+import styles from './EnergyHeader.module.css';
+import { geocodeLocation } from '../../../utils/api';
+import type { Location } from '../../../types/app';
 
 interface EnergyHeaderProps {
-    onLocationsChange?: (locations: string[]) => void;
+    onLocationsChange?: (locations: Location[]) => void;
 }
 
 const EnergyHeader: React.FC<EnergyHeaderProps> = ({ onLocationsChange }) => {
     const [locationQuery, setLocationQuery] = useState('');
     const [isSearching, setIsSearching] = useState(false);
-    const [searchResults, setSearchResults] = useState<string[]>([]);
-    const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+    const [searchResults, setSearchResults] = useState<Location[]>([]);
+    const [selectedLocations, setSelectedLocations] = useState<Location[]>([]);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [selectedMonth, setSelectedMonth] = useState<string>(''); 
 
     const handleLocationSearch = useCallback(async (query: string) => {
         setLocationQuery(query);
+        setShowDropdown(true);
         
         if (query.length < 2) {
             setSearchResults([]);
@@ -32,142 +39,204 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({ onLocationsChange }) => {
 
         setIsSearching(true);
         
-        // Mock search results - replace with actual API call
-        const mockResults = [
-            'São Paulo, SP, Brasil',
-            'Rio de Janeiro, RJ, Brasil',
-            'Belo Horizonte, MG, Brasil',
-            'Salvador, BA, Brasil',
-            'Fortaleza, CE, Brasil'
-        ].filter(city => 
-            city.toLowerCase().includes(query.toLowerCase())
-        );
-        
-        setTimeout(() => {
-            setSearchResults(mockResults);
+        try {
+            const locations = await geocodeLocation(query);
+            
+            // Filtra locações que já foram selecionadas
+            const filteredResults = locations.filter(location => 
+                !selectedLocations.some(selected => 
+                    selected.city.toLowerCase() === location.city.toLowerCase() &&
+                    selected.state.toLowerCase() === location.state.toLowerCase()
+                )
+            );
+            
+            setSearchResults(filteredResults);
+        } catch (error) {
+            console.error('Erro ao buscar localização:', error);
+            setSearchResults([]);
+        } finally {
             setIsSearching(false);
-        }, 500);
-    }, []);
+        }
+    }, [selectedLocations]);
 
-    const handleLocationSelect = (location: string) => {
-        if (selectedLocations.length < 5 && !selectedLocations.includes(location)) {
+    const handleLocationSelect = (location: Location) => {
+        if (selectedLocations.length < 5 && !selectedLocations.some(selected => 
+            selected.city === location.city && selected.state === location.state
+        )) {
             const newLocations = [...selectedLocations, location];
             setSelectedLocations(newLocations);
             onLocationsChange?.(newLocations);
         }
         setLocationQuery('');
         setSearchResults([]);
+        setShowDropdown(false);
     };
 
-    const handleLocationRemove = (location: string) => {
-        const newLocations = selectedLocations.filter(loc => loc !== location);
+    const handleLocationRemove = (location: Location) => {
+        const newLocations = selectedLocations.filter(loc => 
+            !(loc.city === location.city && loc.state === location.state)
+        );
         setSelectedLocations(newLocations);
         onLocationsChange?.(newLocations);
+        if (newLocations.length === 0) {
+            setShowDropdown(false);
+        }
     };
 
+    const handleClearAllLocations = () => {
+        setSelectedLocations([]);
+        onLocationsChange?.([]);
+        setShowDropdown(false);
+        setLocationQuery('');
+        setSearchResults([]);
+    }
+
+    const handleClickAway = () => {
+        if (selectedLocations.length < 5) {
+            setShowDropdown(false);
+        }
+        setSearchResults([]);
+    };
+
+    // Renderização do componente
     return (
-        <AppBar position="static" sx={{ backgroundColor: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-            <Toolbar sx={{ justifyContent: 'space-between', py: 1, px: 4 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <img 
-                        src="/weatherdata.png" 
-                        alt="CLIMADATA" 
-                        style={{ height: '40px', width: 'auto' }}
-                    />
-                    <Typography sx={{ color: '#1976d2', fontWeight: 'bold', fontSize: '18px' }}>
-                        CLIMADATA
-                    </Typography>
-                </Box>
-                
-                <Typography variant="h4" sx={{ 
-                    color: '#333', 
-                    fontWeight: 'bold',
-                    textAlign: 'center',
-                    flex: 1,
-                    fontSize: '24px'
-                }}>
-                    Indicadores de Oportunidades Renováveis
-                </Typography>
-                
-                <Box sx={{ position: 'relative', width: 280 }}>
-                    <TextField
-                        size="small"
-                        placeholder="Busque até 5 locais"
-                        value={locationQuery}
-                        onChange={(e) => handleLocationSearch(e.target.value)}
-                        sx={{ width: '100%' }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <Search />
-                                </InputAdornment>
-                            ),
-                            endAdornment: isSearching ? (
-                                <InputAdornment position="end">
-                                    <CircularProgress size={16} />
-                                </InputAdornment>
-                            ) : null
-                        }}
-                    />
+        <div>
+            {/* Logo */}
+            <div className={styles.logoSection}>
+                <img 
+                    src="/weatherdata.png" 
+                    alt="CLIMADATA" 
+                    className={styles.logoImage}
+                />
+            </div>
+
+            {/* Card branco principal */}
+            <div className={styles.whiteCard}>
+                <div className={styles.mainRow}>
+                    {/* Título */}
+                    <div className={styles.titleSection}>
+                        <Typography variant="h4" className={styles.title}>
+                            Indicadores de Oportunidades Renováveis
+                        </Typography>
+                    </div>
                     
-                    {/* Resultados da busca */}
-                    {searchResults.length > 0 && (
-                        <Paper sx={{ 
-                            position: 'absolute',
-                            top: '100%',
-                            left: 0,
-                            right: 0,
-                            zIndex: 1000,
-                            maxHeight: 200,
-                            overflow: 'auto',
-                            mt: 0.5
-                        }}>
-                            {searchResults.map((location, index) => (
-                                <Box
-                                    key={index}
-                                    sx={{
-                                        p: 1.5,
-                                        cursor: 'pointer',
-                                        '&:hover': { backgroundColor: '#f5f5f5' },
-                                        borderBottom: index < searchResults.length - 1 ? '1px solid #eee' : 'none'
-                                    }}
-                                    onClick={() => handleLocationSelect(location)}
+                    {/* Seleção de mês */}
+                    <div className={styles.monthSection}>
+                        <Select
+                            value={selectedMonth}
+                            onChange={(e) => setSelectedMonth(e.target.value)}
+                            displayEmpty
+                            variant="standard" // Adicionado
+                            disableUnderline // Adicionado
+                            IconComponent={ArrowDropDown} // Opcional: Garante o ícone de dropdown (seta)
+                            MenuProps={{
+                                PaperProps: {
+                                    className: styles.monthDropdownPaper // Nova classe para o Paper
+                                }
+                            }}
+                        >
+                            <MenuItem value="">Select a month</MenuItem>
+                            <MenuItem value="01">January</MenuItem>
+                            <MenuItem value="02">February</MenuItem>
+                            <MenuItem value="03">March</MenuItem>
+                            <MenuItem value="04">April</MenuItem>
+                            <MenuItem value="05">May</MenuItem>
+                            <MenuItem value="06">June</MenuItem>
+                            <MenuItem value="07">July</MenuItem>
+                            <MenuItem value="08">August</MenuItem>
+                            <MenuItem value="09">September</MenuItem>
+                            <MenuItem value="10">October</MenuItem>
+                            <MenuItem value="11">November</MenuItem>
+                            <MenuItem value="12">December</MenuItem>
+                        </Select>
+                    </div>
+                    
+                    {/* Input de cidades expansível */}
+                    <div className={styles.citiesSection}>
+                        <ClickAwayListener onClickAway={handleClickAway}>
+                            <div style={{ position: 'relative' }}>
+                                
+                                {/* Campo de busca fixo no card */}
+                                <div 
+                                    className={styles.searchField}
+                                    onClick={() => setShowDropdown(true)}
                                 >
-                                    <Typography variant="body2">{location}</Typography>
-                                </Box>
-                            ))}
-                        </Paper>
-                    )}
-                    
-                    {/* Locais selecionados */}
-                    {selectedLocations.length > 0 && (
-                        <Box sx={{ 
-                            position: 'absolute',
-                            top: '100%',
-                            left: 0,
-                            right: 0,
-                            zIndex: 999,
-                            mt: searchResults.length > 0 ? '200px' : '4px'
-                        }}>
-                            <Paper sx={{ p: 1 }}>
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                    {selectedLocations.map((location) => (
-                                        <Chip
-                                            key={location}
-                                            label={location}
-                                            size="small"
-                                            onDelete={() => handleLocationRemove(location)}
-                                            color="primary"
-                                            variant="outlined"
-                                        />
-                                    ))}
-                                </Box>
-                            </Paper>
-                        </Box>
-                    )}
-                </Box>
-            </Toolbar>
-        </AppBar>
+                                    <TextField
+                                        size="small"
+                                        placeholder="Busque até 5 locais"
+                                        value={locationQuery}
+                                        onChange={(e) => handleLocationSearch(e.target.value)}
+                                        onFocus={() => setShowDropdown(true)}
+                                        variant="standard"
+                                        InputProps={{
+                                            disableUnderline: true,
+                                            startAdornment: !locationQuery ? (
+                                                <InputAdornment position="start">
+                                                    <Search />
+                                                </InputAdornment>
+                                            ) : null,
+                                            endAdornment: isSearching ? (
+                                                <InputAdornment position="end">
+                                                    <CircularProgress size={14} />
+                                                </InputAdornment>
+                                            ) : null
+                                        }}
+                                    />
+                                </div>
+
+                                {/* Container das cidades selecionadas - aparece abaixo e fora do card */}
+                                {selectedLocations.length > 0 && (
+                                    <div className={styles.selectedCitiesContainer}>
+                                        {/* Chips das cidades selecionadas */}
+                                        {selectedLocations.map((location, index) => (
+                                            <div
+                                                key={`${location.city}-${location.state}-${index}`}
+                                                className={styles.cityChipContainer}
+                                            >
+                                                <Chip
+                                                    label={`${location.city}, ${location.state}`}
+                                                    size="small"
+                                                    onDelete={() => handleLocationRemove(location)}
+                                                />
+                                            </div>
+                                        ))}
+
+                                        {/* Botão para limpar todas as cidades quando há 5 */}
+                                        {selectedLocations.length === 5 && (
+                                            <div className={styles.clearAllButton}>
+                                                <IconButton 
+                                                    size="small" 
+                                                    onClick={handleClearAllLocations}
+                                                >
+                                                    <Close fontSize="small" />
+                                                </IconButton>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                                
+                                {/* Dropdown de resultados da API */}
+                                {showDropdown && searchResults.length > 0 && selectedLocations.length < 5 && (
+                                    <Paper className={styles.dropdown}>
+                                        {searchResults.map((location, index) => (
+                                            <div
+                                                key={index}
+                                                className={styles.dropdownItem}
+                                                onClick={() => handleLocationSelect(location)}
+                                            >
+                                                <Typography variant="body2">
+                                                    {`${location.city}, ${location.state}`}
+                                                </Typography>
+                                            </div>
+                                        ))}
+                                    </Paper>
+                                )}
+                            </div>
+                        </ClickAwayListener>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 };
 

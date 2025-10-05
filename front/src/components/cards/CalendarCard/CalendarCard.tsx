@@ -4,7 +4,7 @@ import { useApp } from '../../../contexts/AppContext';
 
 const CalendarCard: React.FC = () => {
     const { state, setSelectedDate, setSelectedTime, updateCalendarMonth } = useApp();
-    const { calendar, selectedDate, selectedTime } = state;
+    const { calendar, selectedDate } = state;
 
     const daysOfWeek = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
     const monthNames = [
@@ -59,32 +59,6 @@ const CalendarCard: React.FC = () => {
     const handleDateClick = async (dateString: string) => {
         await setSelectedDate(dateString);
     };
-
-    // Seleção de horário
-    const handleTimeChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const value = event.target.value;
-        if (value === '') {
-            // Horário não definido
-            await setSelectedTime(null);
-        } else {
-            const hour = parseInt(value);
-            if (!isNaN(hour)) {
-                await setSelectedTime({
-                    hour,
-                    formatted: `${hour.toString().padStart(2, '0')}:00`
-                });
-            }
-        }
-    };
-
-    // Gera opções de horário (inclui opção para "todos os horários")
-    const timeOptions = [
-        { hour: undefined, formatted: 'All Day' },
-        ...Array.from({ length: 24 }, (_, i) => ({
-            hour: i,
-            formatted: `${i.toString().padStart(2, '0')}:00`
-        }))
-    ];
 
     return (
         <div className="calendar-card">

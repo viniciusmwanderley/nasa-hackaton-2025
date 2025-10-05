@@ -19,9 +19,7 @@ interface EnergyChartsProps {
 }
 
 const EnergyCharts: React.FC<EnergyChartsProps> = ({ 
-    selectedMonth = 'janeiro', 
-    onMonthChange 
-}) => {
+    }) => {
     // Mock data baseado na captura de tela
     const solarData = [
         { city: 'São Paulo', shortName: 'SP', value: 142 },
@@ -84,20 +82,6 @@ const EnergyCharts: React.FC<EnergyChartsProps> = ({
         <Container maxWidth="xl" sx={{ px: 4 }}>
             {/* Seletor de Mês */}
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
-                <FormControl sx={{ minWidth: 200 }}>
-                    <InputLabel>Selecione o mês</InputLabel>
-                    <Select
-                        value={selectedMonth}
-                        onChange={(e) => onMonthChange?.(e.target.value)}
-                        label="Selecione o mês"
-                    >
-                        {months.map((month) => (
-                            <MenuItem key={month.value} value={month.value}>
-                                {month.label}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
             </Box>
 
             {/* Gráficos de Energia */}

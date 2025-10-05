@@ -15,7 +15,7 @@ import Header from '../../components/layout/Header/Header';
 import ActionBar from '../../components/layout/ActionBar/ActionBar';
 
 const Dashboard: React.FC = () => {
-    const { state, fetchWeatherData, setSelectedTime } = useApp();
+    const { state, fetchWeatherData } = useApp();
 
     const handleExportRawData = async () => {
         // Primeiro carrega os dados se não existirem

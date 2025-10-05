@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
 import { Box } from '@mui/material';
 import { EnergyHeader, EnergyCharts, EnergyInfo } from '../components/energy';
+import type { Location } from '../types/app';
 
 const EnergyPanel: React.FC = () => {
     const [selectedMonth, setSelectedMonth] = useState('janeiro');
     const [selectedCity, setSelectedCity] = useState('fortaleza');
 
-    const handleLocationsChange = (locations: string[]) => {
+    const handleLocationsChange = (locations: Location[]) => {
         // Aqui você pode implementar lógica adicional quando as localizações mudarem
         console.log('Localizações selecionadas:', locations);
+        // Agora você tem acesso a latitude, longitude, cidade, estado e país de cada localização
+        locations.forEach(location => {
+            console.log(`${location.city}, ${location.state} - Lat: ${location.latitude}, Lon: ${location.longitude}`);
+        });
     };
 
     const handleMonthChange = (month: string) => {
