@@ -37,7 +37,7 @@
 }
 
 .access-button {
-    background: #3b82f6;
+    background: #C75906;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -46,13 +46,12 @@
     font-weight: 600;
     font-size: 0.9rem;
     transition: all 0.2s;
-    min-width: 120px;
+    min-width: 200px;
 }
 
 .access-button:hover {
-    background: #2563eb;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 4px 12px rgba(199, 89, 6, 0.4);
 }
 
 .energy-illustration-area {
@@ -64,7 +63,7 @@
 }
 
 .energy-illustration-area img {
-    width: 240px; /* ajuste para o tamanho que você quiser */
+    width: 180px; /* ajuste para o tamanho que você quiser */
     height: auto; /* mantém a proporção */
     display: block;
     margin: 0 auto; /* centraliza horizontalmente */

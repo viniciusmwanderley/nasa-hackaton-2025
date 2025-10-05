@@ -33,7 +33,7 @@ const initialState: AppState = {
     state: "PB",
     country: "Brasil"
   },
-  selectedDate: '2025-09-01',
+  selectedDate: getCurrentDate(), // Atualiza para usar a data atual
   selectedTime: null, // Inicializa sem horário definido
   weatherData: {
     temperature: 28,

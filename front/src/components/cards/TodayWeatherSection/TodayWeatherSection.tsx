@@ -7,13 +7,20 @@ import { geocodeLocation } from '../../../utils/api';
 const TodayWeatherSection: React.FC = () => {
   const { state, setSelectedDate, setSelectedTime, setLocation } = useApp();
   const { weatherData, location, selectedDate, selectedTime } = state;
-  
+
   // Estados para busca de localização
   const [locationQuery, setLocationQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!selectedDate) {
+      const today = new Date().toISOString().split('T')[0];
+      setSelectedDate(today);
+    }
+  }, [selectedDate, setSelectedDate]);
 
   // Fecha o dropdown quando clicar fora
   useEffect(() => {
@@ -32,7 +39,7 @@ const TodayWeatherSection: React.FC = () => {
   // Busca de localização
   const handleLocationSearch = async (query: string) => {
     setLocationQuery(query);
-    
+
     if (!query.trim()) {
       setSearchResults([]);
       setShowDropdown(false);
@@ -41,7 +48,7 @@ const TodayWeatherSection: React.FC = () => {
 
     setIsSearching(true);
     setShowDropdown(true);
-    
+
     try {
       const results = await geocodeLocation(query);
       setSearchResults(results);
@@ -125,53 +132,54 @@ const TodayWeatherSection: React.FC = () => {
   const metricsData = [
     {
       imageSrc: '/sun.png',
-      value: '28 °C temperatura',
+      value: '28 °C temperature',
       label: '',
       variant: 'temperature' as const
     },
     {
       imageSrc: '/calor-extremo.png',
-      value: '2% de chance de calor extremo',
+      value: '2% chance of extreme heat',
       label: '',
       variant: 'extreme-heat' as const
     },
     {
       imageSrc: '/vento-folha.png',
-      value: '47% risco de vento forte',
+      value: '47% chance of strong winds',
       label: '',
       variant: 'wind' as const
     },
     {
       imageSrc: '/chuva.png',
-      value: '7% de umidade no ar',
+      value: '7% chance of humidity',
       label: '',
       variant: 'humidity' as const
     },
     {
       imageSrc: '/nuvem.png',
-      value: '27% de céu encoberto',
+      value: '27% chance of overcast',
       label: '',
       variant: 'fog' as const
     },
     {
       imageSrc: '/chuva-nuvem.png',
-      value: '15% chance de chuva',
+      value: '15% chance of rain',
       label: '',
       variant: 'rain' as const
     },
     {
       imageSrc: '/raios.png',
-      value: '3% de chance de tempestade',
+      value: '3% chance of storm',
       label: '',
       variant: 'storm' as const
     },
     {
       imageSrc: '/neve.png',
-      value: '0% de chance de nevar',
+      value: '0% chance of snow',
       label: '',
       variant: 'snow' as const
     }
-  ];  return (
+  ];
+  return (
     <div className="today-weather-section">
       <div className="section-header">
         <div className="header-left">
@@ -181,7 +189,7 @@ const TodayWeatherSection: React.FC = () => {
             <span className="location-text">{location.city} - {location.state}</span>
           </div>
         </div>
-        
+
         <div className="weather-controls">
           <div className="control-group location-search-group" ref={dropdownRef}>
             <div className="location-search-container">
@@ -192,13 +200,13 @@ const TodayWeatherSection: React.FC = () => {
                 onChange={(e) => handleLocationSearch(e.target.value)}
                 className="control-select location-search-input"
               />
-              
+
               {showDropdown && (
                 <div className="location-dropdown">
                   {isSearching && (
                     <div className="search-loading">Searching...</div>
                   )}
-                  
+
                   {!isSearching && searchResults.length > 0 && (
                     <>
                       {searchResults.map((result, index) => (
@@ -215,7 +223,7 @@ const TodayWeatherSection: React.FC = () => {
                       ))}
                     </>
                   )}
-                  
+
                   {!isSearching && searchResults.length === 0 && locationQuery.trim() && (
                     <div className="no-results">No results found</div>
                   )}
@@ -223,9 +231,9 @@ const TodayWeatherSection: React.FC = () => {
               )}
             </div>
           </div>
-          
+
           <div className="control-group">
-            <select 
+            <select
               className="control-select time-select"
               value={selectedTime?.hour ?? ''}
               onChange={handleTimeChange}
@@ -237,7 +245,7 @@ const TodayWeatherSection: React.FC = () => {
               ))}
             </select>
           </div>
-          
+
           <div className="control-group">
             <input
               type="date"
@@ -248,7 +256,7 @@ const TodayWeatherSection: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       <div className="metrics-grid">
         {metricsData.map((metric, index) => (
           <MetricsCard

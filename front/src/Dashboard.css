@@ -80,6 +80,30 @@ body {
   overflow-y: auto;
 }
 
+/* Report Controls */
+.report-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px; /* Adds spacing below the Create Report section */
+}
+
+.report-controls .header-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.report-controls .time-select-container {
+  margin-left: 20px; /* Adds spacing to the right of Create Report */
+}
+
+.time-select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
 /* Responsive Design */
 @media (max-width: 1440px) { /* Ajustei o breakpoint para acompanhar o novo max-width */
     .dashboard-container {

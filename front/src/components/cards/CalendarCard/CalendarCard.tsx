@@ -88,21 +88,6 @@ const CalendarCard: React.FC = () => {
 
     return (
         <div className="calendar-card">
-            <div className="card-header">
-                <span className="header-title">Create Report</span>
-                <select 
-                    className="time-select" 
-                    value={selectedTime?.hour ?? ''} 
-                    onChange={handleTimeChange}
-                >
-                    {timeOptions.map(({ hour, formatted }, index) => (
-                        <option key={index} value={hour ?? ''}>
-                            {formatted}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            
             <div className="calendar-month-controls">
                 <button className="arrow-btn" onClick={goToPreviousMonth}>&lt;</button>
                 <span className="month-year">
