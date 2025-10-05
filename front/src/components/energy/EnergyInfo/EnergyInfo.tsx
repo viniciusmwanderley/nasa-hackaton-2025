@@ -11,10 +11,6 @@ import {
     InputLabel
 } from '@mui/material';
 import styles from './EnergyInfo.module.css';
-import ClimateIndicatorVectorY from '../../../assets/ClimateIndicatorVectorY.png';
-import ClimateIndicatorVectorO from '../../../assets/ClimateIndicatorVectorO.png';
-import ClimateIndicatorVectorLB from '../../../assets/ClimateIndicatorVectorLB.png';
-import ClimateIndicatorVectorB from '../../../assets/ClimateIndicatorVectorB.png';
 
 interface EnergyInfoProps {
     selectedCity?: string;
@@ -32,7 +28,7 @@ const EnergyInfo: React.FC<EnergyInfoProps> = ({
             value: '125',
             unit: '°',
             backgroundColor: '#F9DA5F',
-            backgroundImage: ClimateIndicatorVectorY,
+            backgroundImage: '/ClimateIndicatorVectorY.png',
             textColor: 'black',
             group: 'solar'
         },
@@ -41,7 +37,7 @@ const EnergyInfo: React.FC<EnergyInfoProps> = ({
             value: '47',
             unit: 'kWh/m²',
             backgroundColor: '#C75906',
-            backgroundImage: ClimateIndicatorVectorO,
+            backgroundImage: '/ClimateIndicatorVectorO.png',
             textColor: 'white',
             group: 'solar'
         },
@@ -50,7 +46,7 @@ const EnergyInfo: React.FC<EnergyInfoProps> = ({
             value: '125',
             unit: 'Kg/m³',
             backgroundColor: '#BACCE3',
-            backgroundImage: ClimateIndicatorVectorLB,
+            backgroundImage: '/ClimateIndicatorVectorLB.png',
             textColor: 'black',
             group: 'wind'
         },
@@ -59,7 +55,7 @@ const EnergyInfo: React.FC<EnergyInfoProps> = ({
             value: '47',
             unit: 'm/s',
             backgroundColor: '#0B357E',
-            backgroundImage: ClimateIndicatorVectorB,
+            backgroundImage: '/ClimateIndicatorVectorB.png',
             textColor: 'white',
             group: 'wind'
         }
