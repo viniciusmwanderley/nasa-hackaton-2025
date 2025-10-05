@@ -1,0 +1,42 @@
+/* EnergyHeader.module.css */
+.searchContainer {
+    position: relative;
+    width: 280px;
+}
+
+.searchResults {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-height: 200px;
+    overflow: auto;
+    margin-top: 4px;
+}
+
+.searchResultItem {
+    padding: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.searchResultItem:hover {
+    background-color: #f5f5f5;
+}
+
+.selectedLocations {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    margin-top: 4px;
+}
+
+.locationsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px;
+}

@@ -1,0 +1,66 @@
+/* EnergyCharts.module.css */
+.rankingContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: calc(100% - 60px);
+    overflow-y: auto;
+}
+
+.rankingItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.rankingItem:last-child {
+    border-bottom: none;
+}
+
+.solarRankingItem {
+    border-left: 3px solid #FF9800;
+    padding-left: 12px;
+}
+
+.windRankingItem {
+    border-left: 3px solid #2196F3;
+    padding-left: 12px;
+}
+
+.rankingChip {
+    font-weight: bold !important;
+    font-size: 12px !important;
+    min-width: 32px !important;
+}
+
+.solarChip {
+    background-color: #FF9800 !important;
+    color: white !important;
+}
+
+.windChip {
+    background-color: #2196F3 !important;
+    color: white !important;
+}
+
+.rankingCityName {
+    flex: 1;
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+}
+
+.rankingValue {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.solarValue {
+    color: #FF9800;
+}
+
+.windValue {
+    color: #2196F3;
+}

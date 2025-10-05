@@ -1,0 +1,49 @@
+/* EnergyInfo.module.css */
+.indicatorsContainer {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.indicatorCard {
+    flex: 1 1 250px;
+    min-width: 250px;
+}
+
+.infoCardsContainer {
+    display: flex;
+    gap: 24px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.infoCard {
+    flex: 1 1 45%;
+    min-width: 300px;
+}
+
+.solarInfoCard {
+    background-color: #FFF3C4;
+}
+
+.windInfoCard {
+    background-color: #E3F2FD;
+}
+
+.citySelector {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+}
+
+.dataSource {
+    background-color: #7B4CBF;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    align-self: flex-start;
+    margin-bottom: 8px;
+}

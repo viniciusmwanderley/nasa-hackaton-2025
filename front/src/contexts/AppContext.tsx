@@ -334,7 +334,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     };
 
     try {
-      const response = await fetch('http://localhost:8000/weather/analyze/', {
+      const response = await fetch('https://nasa-hackaton-2025-ten.vercel.app/weather/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

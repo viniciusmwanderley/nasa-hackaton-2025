@@ -76,7 +76,7 @@ const Dashboard: React.FC = () => {
         try {
             console.log('Fazendo fetch para:', 'http://localhost:8000/weather/analyze/');
             
-            const response = await fetch('http://localhost:8000/weather/analyze/', {
+            const response = await fetch('https://nasa-hackaton-2025-ten.vercel.app/weather/analyze', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

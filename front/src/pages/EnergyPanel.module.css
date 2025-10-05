@@ -1,0 +1,290 @@
+es/* EnergyPanel Styles */
+.energyPanel {
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+.header {
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.headerToolbar {
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logoIcon {
+  width: 40px;
+  height: 40px;
+  background-color: #1976d2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoText {
+  color: #1976d2;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.headerTitle {
+  color: #333;
+  font-weight: bold;
+  text-align: center;
+  flex: 1;
+}
+
+.searchField {
+  width: 200px;
+}
+
+.mainContainer {
+  padding: 32px;
+}
+
+.filtersContainer {
+  margin-bottom: 32px;
+  display: flex;
+  gap: 16px;
+}
+
+.filterControl {
+  min-width: 200px;
+}
+
+.chartsContainer {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  width: 100%;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.chartBox {
+  flex: 3;
+  min-width: 0;
+}
+
+.rankingBox {
+  flex: 2;
+  min-width: 0;
+}
+
+.card {
+  padding: 20px;
+  height: 450px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+}
+
+.cardTitle {
+  margin-bottom: 16px;
+  color: #333;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.chartContainer {
+  height: 380px;
+}
+
+.rankingTitle {
+  margin-bottom: 20px;
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
+  line-height: 1.4;
+  color: #333;
+}
+
+.solarTitle {
+  color: #FF9800;
+  font-weight: bold;
+}
+
+.windTitle {
+  color: #2196F3;
+  font-weight: bold;
+}
+
+.rankingContainer {
+  height: 350px;
+  overflow: auto;
+  padding-right: 8px;
+}
+
+.rankingItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.solarRankingItem {
+  background-color: rgba(255, 152, 0, 0.08);
+  border: 1px solid rgba(255, 152, 0, 0.2);
+}
+
+.solarRankingItem:hover {
+  background-color: rgba(255, 152, 0, 0.12);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);
+}
+
+.windRankingItem {
+  background-color: rgba(33, 150, 243, 0.08);
+  border: 1px solid rgba(33, 150, 243, 0.2);
+}
+
+.windRankingItem:hover {
+  background-color: rgba(33, 150, 243, 0.12);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);
+}
+
+.rankingChip {
+  width: 28px;
+  height: 24px;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 6px;
+  color: white;
+}
+
+.solarChip {
+  background-color: #FF9800;
+}
+
+.windChip {
+  background-color: #2196F3;
+}
+
+.rankingCityName {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.2;
+}
+
+.rankingValue {
+  font-size: 11px;
+  font-weight: bold;
+  background-color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.solarValue {
+  color: #FF9800;
+}
+
+.windValue {
+  color: #2196F3;
+}
+
+.indicatorsSection {
+  margin-bottom: 16px;
+}
+
+.sectionTitle {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.indicatorsGrid {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.indicatorCard {
+  flex: 1 1 250px;
+  min-width: 250px;
+  height: 140px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.indicatorContent {
+  padding: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.indicatorBadge {
+  background-color: #7B4CBF;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  align-self: flex-start;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.indicatorTitle {
+  font-weight: bold;
+  color: #333;
+  font-size: 14px;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.indicatorValue {
+  font-weight: bold;
+  font-size: 48px;
+  line-height: 1;
+  margin-top: auto;
+}
+
+.infoCardsContainer {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.infoCard {
+  flex: 1 1 45%;
+  min-width: 300px;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.solarInfoCard {
+  background-color: #FFF3C4;
+}
+
+.windInfoCard {
+  background-color: #E3F2FD;
+}
+
+.infoCardTitle {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.infoCardText {
+  color: #666;
+}
