@@ -6,9 +6,8 @@ const RenewableEnergyCard: React.FC = () => {
         <div className="energy-card">
             <div className="energy-content">
                 <div className="energy-text">
-                    <h3 className="energy-title">Explore o poder das energias renováveis</h3>
-                    <p className="energy-subtitle">Descubra onde investir no futuro limpo</p>
-                    <button className="access-button">Acessar Painel</button>
+                    <h3 className="energy-title">Explore the potential of renewable energy</h3>
+                    <p className="energy-subtitle">Discover where to invest in a clean future</p>
                 </div>
                 
                 <div className="energy-illustration-area">
@@ -17,7 +16,7 @@ const RenewableEnergyCard: React.FC = () => {
                         alt="Painel de energias renováveis"
                     />
                 </div>
-
+                <button className="access-button">Access Panel</button>
             </div>
         </div>
     );

@@ -25,7 +25,7 @@ const MapCard: React.FC = () => {
   return (
     <div className="map-card">
       <div className="card-header map-header">
-        <span className="header-title">Local</span>
+        <span className="header-title">Location</span>
         <span className="header-location">{location.city}, {location.state}</span>
       </div>
 

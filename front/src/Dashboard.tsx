@@ -15,7 +15,7 @@ import {
 } from './components';
 
 const Dashboard: React.FC = () => {
-    const { state, fetchWeatherData } = useApp();
+    const { state, fetchWeatherData, setSelectedTime } = useApp(); // Added setSelectedTime
 
     const handleGenerateReport = async () => {
         console.log('Gerando relatório para:', {
@@ -26,6 +26,30 @@ const Dashboard: React.FC = () => {
         
         // Busca dados atualizados quando gerar relatório
         await fetchWeatherData();
+
+        // Generate CSV data
+        const exportData = [
+            {
+                Location: state.location.city,
+                Date: state.selectedDate,
+                Time: state.selectedTime?.formatted || 'All Day',
+                Temperature: state.weatherData?.temperature || 'N/A', // Added null check
+                Description: state.weatherData?.description || 'N/A' // Added null check
+            },
+            ...state.forecast.map(forecast => ({
+                Date: forecast.date,
+                MinTemperature: forecast.minTemperature,
+                MaxTemperature: forecast.maxTemperature,
+                Condition: forecast.condition
+            }))
+        ];
+
+        const csvContent = exportData.map(row => Object.values(row).join(',')).join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `weather-report-${state.selectedDate}.csv`;
     };
 
     const handleExport = () => {
@@ -76,11 +100,43 @@ const Dashboard: React.FC = () => {
                 {/* Coluna Lateral - Direita (Container com fundo claro) */}
                 <div className="right-panel">
                     <div className="sidebar-container">
+                        <div className="report-controls">
+                            <span className="header-title">Create Report</span>
+                            <div className="time-select-container"> {/* Added container for spacing */}
+                                <select 
+                                    className="time-select" 
+                                    value={state.selectedTime?.hour ?? ''} 
+                                    onChange={(event) => {
+                                        const value = event.target.value;
+                                        if (value === '') {
+                                            setSelectedTime(null); // Corrected usage
+                                        } else {
+                                            const hour = parseInt(value);
+                                            if (!isNaN(hour)) {
+                                                setSelectedTime({ // Corrected usage
+                                                    hour,
+                                                    formatted: `${hour.toString().padStart(2, '0')}:00`
+                                                });
+                                            }
+                                        }
+                                    }}
+                                >
+                                    {[{ hour: undefined, formatted: 'All Day' },
+                                    ...Array.from({ length: 24 }, (_, i) => ({
+                                        hour: i,
+                                        formatted: `${i.toString().padStart(2, '0')}:00`
+                                    }))].map(({ hour, formatted }, index) => (
+                                        <option key={index} value={hour ?? ''}>
+                                            {formatted}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
                         <CalendarCard />
                         <MapCard />
                         <ActionBar 
-                            onGenerateReport={handleGenerateReport}
-                            onExport={handleExport}
+                            onGenerateReport={handleGenerateReport} // Removed onExport
                         />
                     </div>
                 </div>

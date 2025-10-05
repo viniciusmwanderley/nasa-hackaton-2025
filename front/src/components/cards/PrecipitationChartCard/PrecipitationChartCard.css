@@ -10,6 +10,11 @@
     flex-direction: column;
 }
 
+.chart-container {
+    flex: 1;
+    margin-top: 16px;
+}
+
 /* ---------- HEADER ---------- */
 .card-header {
     display: flex;
@@ -44,6 +49,9 @@
 }
 
 .header-location-arrow {
+    margin-left: 8px;
+    color: #888;
+    font-size: 12px;
     width: 0;
     height: 0;
     border-left: 5px solid transparent;
@@ -199,6 +207,20 @@
 
 /* ---------- RESPONSIVIDADE ---------- */
 @media (max-width: 768px) {
+    .precipitation-card {
+        padding: 12px;
+    }
+    
+    .header-title {
+        font-size: 18px;
+    }
+    
+    .header-location {
+        font-size: 13px;
+    }
+    
+    .chart-container {
+        height: 250px;
     .chart-area {
         height: 140px;
     }
