@@ -7,7 +7,7 @@ import type { RiskResponseLean } from '../types/api';
 type AppAction =
   | { type: 'SET_LOCATION'; payload: Location }
   | { type: 'SET_SELECTED_DATE'; payload: string }
-  | { type: 'SET_SELECTED_TIME'; payload: TimeSelection }
+  | { type: 'SET_SELECTED_TIME'; payload: TimeSelection | null }
   | { type: 'SET_WEATHER_DATA'; payload: WeatherData }
   | { type: 'SET_FORECAST'; payload: DayForecast[] }
   | { type: 'SET_PRECIPITATION_DATA'; payload: PrecipitationData[] }
@@ -23,14 +23,7 @@ const getCurrentDate = () => {
   return today.toISOString().split('T')[0];
 };
 
-const getCurrentTime = (): TimeSelection => {
-  const now = new Date();
-  const hour = now.getHours();
-  return {
-    hour,
-    formatted: `${hour.toString().padStart(2, '0')}:00`
-  };
-};
+
 
 const initialState: AppState = {
   location: {
@@ -41,7 +34,7 @@ const initialState: AppState = {
     country: "Brasil"
   },
   selectedDate: '2025-09-01',
-  selectedTime: getCurrentTime(),
+  selectedTime: null, // Inicializa sem horário definido
   weatherData: {
     temperature: 28,
     description: "Que calorão! Procure abrigo fresco, use roupas claras e beba água.",
@@ -51,13 +44,13 @@ const initialState: AppState = {
     condition: "hot"
   },
   forecast: [
-    { dayInitial: 'S', date: getCurrentDate(), temperature: 28, condition: 'sunny' },
-    { dayInitial: 'T', date: getCurrentDate(), temperature: 26, condition: 'cloudy' },
-    { dayInitial: 'Q', date: getCurrentDate(), temperature: 24, condition: 'rainy' },
-    { dayInitial: 'Q', date: getCurrentDate(), temperature: 25, condition: 'sunny' },
-    { dayInitial: 'S', date: getCurrentDate(), temperature: 27, condition: 'sunny' },
-    { dayInitial: 'S', date: getCurrentDate(), temperature: 29, condition: 'sunny' },
-    { dayInitial: 'D', date: getCurrentDate(), temperature: 30, condition: 'sunny' }
+    { dayInitial: 'S', date: getCurrentDate(), minTemperature: 24, maxTemperature: 30, condition: 'sunny' },
+    { dayInitial: 'T', date: getCurrentDate(), minTemperature: 22, maxTemperature: 28, condition: 'cloudy' },
+    { dayInitial: 'Q', date: getCurrentDate(), minTemperature: 20, maxTemperature: 26, condition: 'rainy' },
+    { dayInitial: 'Q', date: getCurrentDate(), minTemperature: 21, maxTemperature: 27, condition: 'sunny' },
+    { dayInitial: 'S', date: getCurrentDate(), minTemperature: 23, maxTemperature: 29, condition: 'sunny' },
+    { dayInitial: 'S', date: getCurrentDate(), minTemperature: 25, maxTemperature: 31, condition: 'sunny' },
+    { dayInitial: 'D', date: getCurrentDate(), minTemperature: 26, maxTemperature: 32, condition: 'sunny' }
   ],
   precipitationData: Array.from({ length: 31 }, () => ({
     date: getCurrentDate(),
@@ -157,7 +150,7 @@ interface AppContextType {
   // Ações auxiliares
   setLocation: (location: Location) => void;
   setSelectedDate: (date: string) => void;
-  setSelectedTime: (time: TimeSelection) => void;
+  setSelectedTime: (time: TimeSelection | null) => void;
   updateCalendarMonth: (month: number, year: number) => void;
   fetchWeatherData: () => Promise<void>;
 }
@@ -181,7 +174,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     dispatch({ type: 'SET_SELECTED_DATE', payload: date });
   };
 
-  const setSelectedTime = (time: TimeSelection) => {
+  const setSelectedTime = (time: TimeSelection | null) => {
     dispatch({ type: 'SET_SELECTED_TIME', payload: time });
   };
 
@@ -208,7 +201,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         latitude: state.location.latitude,
         longitude: state.location.longitude,
         target_date: state.selectedDate,
-        target_hour: state.selectedTime.hour,
+        target_hour: state.selectedTime?.hour ?? 12, // Usa 12h como padrão quando não definido
         very_hot: {
           probability: Math.random(),
           confidence_interval: {
