@@ -1,25 +1,84 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './TodayWeatherSection.css';
 import { useApp } from '../../../contexts/AppContext';
 import MetricsCard from '../MetricsCard/MetricsCard';
+import { geocodeLocation } from '../../../utils/api';
 
 const TodayWeatherSection: React.FC = () => {
   const { state, setSelectedDate, setSelectedTime, setLocation } = useApp();
   const { weatherData, location, selectedDate, selectedTime } = state;
+  
+  // Estados para busca de localização
+  const [locationQuery, setLocationQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleLocationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const locationKey = event.target.value;
-    // TODO: Implementar mudança de localização baseada na seleção
-    console.log('Mudança de local:', locationKey);
+  // Fecha o dropdown quando clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Busca de localização
+  const handleLocationSearch = async (query: string) => {
+    setLocationQuery(query);
+    
+    if (!query.trim()) {
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    setIsSearching(true);
+    setShowDropdown(true);
+    
+    try {
+      const results = await geocodeLocation(query);
+      setSearchResults(results);
+    } catch (error) {
+      console.error('Erro na busca:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleLocationSelect = (selectedLocation: any) => {
+    setLocation({
+      latitude: selectedLocation.latitude,
+      longitude: selectedLocation.longitude,
+      city: selectedLocation.city,
+      state: selectedLocation.state,
+      country: selectedLocation.country,
+    });
+    setLocationQuery('');
+    setSearchResults([]);
+    setShowDropdown(false);
   };
 
   const handleTimeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const hour = parseInt(event.target.value);
-    if (!isNaN(hour)) {
-      setSelectedTime({
-        hour,
-        formatted: `${hour.toString().padStart(2, '0')}:00`
-      });
+    const value = event.target.value;
+    if (value === '') {
+      // Horário não definido - mostra min/max nas previsões
+      setSelectedTime(null);
+    } else {
+      const hour = parseInt(value);
+      if (!isNaN(hour)) {
+        setSelectedTime({
+          hour,
+          formatted: `${hour.toString().padStart(2, '0')}:00`
+        });
+      }
     }
   };
 
@@ -27,26 +86,29 @@ const TodayWeatherSection: React.FC = () => {
     setSelectedDate(event.target.value);
   };
 
-  // Gera opções de horário (0-23)
-  const timeOptions = Array.from({ length: 24 }, (_, i) => ({
-    hour: i,
-    formatted: `${i.toString().padStart(2, '0')}:00`
-  }));
+  // Gera opções de horário (inclui opção para "todos os horários")
+  const timeOptions = [
+    { hour: undefined, formatted: 'All Day' },
+    ...Array.from({ length: 24 }, (_, i) => ({
+      hour: i,
+      formatted: `${i.toString().padStart(2, '0')}:00`
+    }))
+  ];
 
   if (!weatherData) {
     return (
       <div className="today-weather-section">
         <div className="section-header">
-          <h2 className="section-title">Clima Hoje</h2>
+          <h2 className="section-title">Weather Today</h2>
           <div className="weather-controls">
             <div className="control-group">
               <select className="control-select location-select">
-                <option>Selecione um Local</option>
+                <option>Select Location</option>
               </select>
             </div>
             <div className="control-group">
               <select className="control-select time-select">
-                <option>Defina um Horário</option>
+                <option>Select Time</option>
               </select>
             </div>
             <div className="control-group">
@@ -54,7 +116,7 @@ const TodayWeatherSection: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="metrics-loading">Carregando dados meteorológicos...</div>
+        <div className="metrics-loading">Loading weather data...</div>
       </div>
     );
   }
@@ -113,38 +175,63 @@ const TodayWeatherSection: React.FC = () => {
     <div className="today-weather-section">
       <div className="section-header">
         <div className="header-left">
-          <h2 className="section-title">Clima Hoje</h2>
+          <h2 className="section-title">Weather Today</h2>
           <div className="location-display">
             <span className="location-pin">📍</span>
-            <span className="location-text">João Pessoa - PB</span>
+            <span className="location-text">{location.city} - {location.state}</span>
           </div>
         </div>
         
         <div className="weather-controls">
-          <div className="control-group">
-            <select 
-              className="control-select location-select"
-              value={location.city}
-              onChange={handleLocationChange}
-            >
-              <option value="">Selecione um Local</option>
-              <option value="joao-pessoa">João Pessoa - PB</option>
-              <option value="fortaleza">Fortaleza - CE</option>
-              <option value="recife">Recife - PE</option>
-              <option value="natal">Natal - RN</option>
-              <option value="salvador">Salvador - BA</option>
-            </select>
+          <div className="control-group location-search-group" ref={dropdownRef}>
+            <div className="location-search-container">
+              <input
+                type="text"
+                placeholder="Select a Location"
+                value={locationQuery}
+                onChange={(e) => handleLocationSearch(e.target.value)}
+                className="control-select location-search-input"
+              />
+              
+              {showDropdown && (
+                <div className="location-dropdown">
+                  {isSearching && (
+                    <div className="search-loading">Searching...</div>
+                  )}
+                  
+                  {!isSearching && searchResults.length > 0 && (
+                    <>
+                      {searchResults.map((result, index) => (
+                        <div
+                          key={index}
+                          className="location-option"
+                          onClick={() => handleLocationSelect(result)}
+                        >
+                          <span className="location-icon">📍</span>
+                          <span className="location-name">
+                            {result.city}, {result.state}
+                          </span>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                  
+                  {!isSearching && searchResults.length === 0 && locationQuery.trim() && (
+                    <div className="no-results">No results found</div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
           
           <div className="control-group">
             <select 
               className="control-select time-select"
-              value={selectedTime.hour}
+              value={selectedTime?.hour ?? ''}
               onChange={handleTimeChange}
             >
-              <option value="">Defina um Horário</option>
-              {timeOptions.map(({ hour, formatted }) => (
-                <option key={hour} value={hour}>
+              {timeOptions.map(({ hour, formatted }, index) => (
+                <option key={index} value={hour ?? ''}>
                   {formatted}
                 </option>
               ))}
