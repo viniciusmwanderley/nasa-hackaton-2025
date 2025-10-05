@@ -10,7 +10,7 @@ from fastapi.exception_handlers import http_exception_handler
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from pythonjsonlogger import jsonlogger
-from .presentation import weather_router, WeatherAnalysisException
+from .presentation import weather_router, climate_router, WeatherAnalysisException
 
 
 class RequestIDMiddleware(BaseHTTPMiddleware):
@@ -75,9 +75,9 @@ setup_logging()
 
 # Create FastAPI app
 app = FastAPI(
-    title="Outdoor Risk API",
+    title="NASA Climate Analysis API",
     version="1.0.0",
-    description="NASA Hackathon 2025 - Weather Risk Assessment API using NASA POWER data for outdoor activity planning",
+    description="NASA Hackathon 2025 - Weather Risk Assessment & Renewable Energy Potential API using NASA POWER data",
     docs_url="/docs",
     redoc_url="/redoc"
 )
@@ -87,6 +87,9 @@ app.add_middleware(RequestIDMiddleware)
 
 # Include weather analysis routes
 app.include_router(weather_router)
+
+# Include climate energy analysis routes
+app.include_router(climate_router)
 
 
 # Global exception handler for weather analysis exceptions
@@ -147,9 +150,21 @@ def health():
     """Health check endpoint for the main application."""
     return {
         "status": "ok",
-        "service": "outdoor_risk_api",
+        "service": "nasa_climate_analysis_api",
         "version": app.version,
-        "description": "Weather Risk Assessment API"
+        "description": "Weather Risk Assessment & Renewable Energy Potential API",
+        "available_services": [
+            {
+                "name": "weather_analysis",
+                "endpoint": "/weather/health",
+                "description": "Weather risk assessment for outdoor activities"
+            },
+            {
+                "name": "climate_energy_analysis", 
+                "endpoint": "/climate-energy/health",
+                "description": "Renewable energy potential assessment"
+            }
+        ]
     }
 
 
