@@ -56,20 +56,20 @@ const CalendarCard: React.FC = () => {
     };
 
     // Seleção de data
-    const handleDateClick = (dateString: string) => {
-        setSelectedDate(dateString);
+    const handleDateClick = async (dateString: string) => {
+        await setSelectedDate(dateString);
     };
 
     // Seleção de horário
-    const handleTimeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleTimeChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
         const value = event.target.value;
         if (value === '') {
             // Horário não definido
-            setSelectedTime(null);
+            await setSelectedTime(null);
         } else {
             const hour = parseInt(value);
             if (!isNaN(hour)) {
-                setSelectedTime({
+                await setSelectedTime({
                     hour,
                     formatted: `${hour.toString().padStart(2, '0')}:00`
                 });
@@ -88,20 +88,6 @@ const CalendarCard: React.FC = () => {
 
     return (
         <div className="calendar-card">
-            <div className="card-header">
-                <span className="header-title">Create Report</span>
-                <select 
-                    className="time-select" 
-                    value={selectedTime?.hour ?? ''} 
-                    onChange={handleTimeChange}
-                >
-                    {timeOptions.map(({ hour, formatted }, index) => (
-                        <option key={index} value={hour ?? ''}>
-                            {formatted}
-                        </option>
-                    ))}
-                </select>
-            </div>
             
             <div className="calendar-month-controls">
                 <button className="arrow-btn" onClick={goToPreviousMonth}>&lt;</button>

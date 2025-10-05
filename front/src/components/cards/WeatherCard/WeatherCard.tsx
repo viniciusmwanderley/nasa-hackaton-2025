@@ -1,6 +1,7 @@
 import React from 'react';
 import './WeatherCard.css';
 import { useApp } from '../../../contexts/AppContext';
+import { WeatherCardSkeleton } from '../../common/SkeletonLoader';
 
 // Função para obter emoji baseado na condição
 const getWeatherEmoji = (condition: string) => {
@@ -36,18 +37,21 @@ const getWeatherImage = (condition: string) => {
 
 const WeatherCard: React.FC = () => {
     const { state } = useApp();
-    const { weatherData, location } = state;
+    const { weatherData, location, isLoading } = state;
 
-    // Se não há dados meteorológicos, mostra loading ou dados padrão
+    // Se está carregando, mostra skeleton
+    if (isLoading) {
+        return <WeatherCardSkeleton />;
+    }
+
+    // Se não há dados meteorológicos e não está carregando, não renderiza
+    if (!weatherData && !isLoading) {
+        return null;
+    }
+
+    // Se não há weatherData mas não está em loading, não renderiza o conteúdo
     if (!weatherData) {
-        return (
-            <div className="weather-card">
-                <div className="weather-text-content">
-                    <h2 className="weather-title">Carregando...</h2>
-                    <p className="weather-subtitle">Buscando dados meteorológicos...</p>
-                </div>
-            </div>
-        );
+        return null;
     }
 
     return (

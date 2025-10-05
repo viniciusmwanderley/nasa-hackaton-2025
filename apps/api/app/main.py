@@ -8,6 +8,7 @@ from typing import Callable
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.exception_handlers import http_exception_handler
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from pythonjsonlogger import jsonlogger
 from .presentation import weather_router, climate_router, WeatherAnalysisException
@@ -80,6 +81,15 @@ app = FastAPI(
     description="NASA Hackathon 2025 - Weather Risk Assessment & Renewable Energy Potential API using NASA POWER data",
     docs_url="/docs",
     redoc_url="/redoc"
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "http://127.0.0.1:5173", "http://127.0.0.1:5174"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Add request ID middleware

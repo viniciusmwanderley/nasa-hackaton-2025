@@ -1,7 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './RenewableEnergyCard.css';
 
 const RenewableEnergyCard: React.FC = () => {
+    const navigate = useNavigate();
+
     return (
         <div className="energy-card">
             <div className="energy-content">
@@ -16,7 +19,7 @@ const RenewableEnergyCard: React.FC = () => {
                         alt="Painel de energias renováveis"
                     />
                 </div>
-                <button className="access-button">Access Panel</button>
+                <button className="access-button" onClick={() => navigate('/energy-panel')}>Access Panel</button>
             </div>
         </div>
     );

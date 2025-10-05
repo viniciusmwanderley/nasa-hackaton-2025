@@ -9,7 +9,7 @@ const ActionBar: React.FC<ActionBarProps> = ({ onGenerateReport }) => {
     return (
         <div className="action-bar-container">
             <button className="report-button" onClick={onGenerateReport}>
-                Create Report
+                Export Raw Data
             </button>
         </div>
     );

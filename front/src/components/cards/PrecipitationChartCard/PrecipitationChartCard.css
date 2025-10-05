@@ -229,3 +229,5 @@
         width: 10px;
     }
 }
+/* Add missing closing bracket for media query */
+}

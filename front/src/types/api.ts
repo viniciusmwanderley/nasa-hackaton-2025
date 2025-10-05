@@ -48,9 +48,71 @@ export interface RiskRequest {
   lon: number;
   date_local: string; // YYYY-MM-DD
   hour_local: string; // HH:00
-  window_days?: number;
-  baseline_start?: number;
-  baseline_end?: number;
-  detail?: string;
-  units?: string;
+}
+
+// Tipos para API /weather/analyze/
+export interface WeatherParameter {
+  value: number;
+  mode: string;
+  climatology_month_mean: number | null;
+  model_used: string | null;
+}
+
+export interface WeatherResult {
+  datetime: string;
+  parameters: {
+    FRSNO: WeatherParameter;
+    PRECTOTCORR: WeatherParameter;
+    RH2M: WeatherParameter;
+    T2M: WeatherParameter;
+    CLOUD_AMT: WeatherParameter;
+    T2M_MIN: WeatherParameter;
+    IMERG_PRECTOT: WeatherParameter;
+    ALLSKY_SFC_SW_DWN: WeatherParameter;
+    T2M_MAX: WeatherParameter;
+    WS10M: WeatherParameter;
+  };
+  derived_insights: {
+    heat_index_c: number;
+  };
+}
+
+export interface WeatherStats {
+  count: number;
+  mean: number;
+  median: number;
+  min: number;
+  max: number;
+  std: number;
+}
+
+export interface WeatherClassifications {
+  precipitation_source: string;
+  rain_probability: number;
+  very_hot_temp_percentile: number;
+  very_snowy_probability: number;
+  very_hot_feels_like_percentile: number;
+  very_windy_percentile: number;
+  very_wet_probability: number;
+  very_wet_precip_threshold: number;
+  very_wet_wind_threshold: number;
+}
+
+export interface WeatherMeta {
+  latitude: number;
+  longitude: number;
+  center_datetime_utc: string;
+  center_datetime_local: string;
+  target_timezone: string;
+  granularity: string;
+  historical_data_range: [string, string];
+}
+
+export interface WeatherAnalyzeResponse {
+  meta: WeatherMeta;
+  stats: {
+    [key: string]: WeatherStats;
+  };
+  classifications: WeatherClassifications;
+  results: WeatherResult[];
 }

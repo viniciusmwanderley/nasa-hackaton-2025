@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './TodayWeatherSection.css';
 import { useApp } from '../../../contexts/AppContext';
 import MetricsCard from '../MetricsCard/MetricsCard';
+import { TodayWeatherSkeleton } from '../../common/SkeletonLoader';
 import { geocodeLocation } from '../../../utils/api';
 
 const TodayWeatherSection: React.FC = () => {
@@ -19,7 +20,7 @@ const TodayWeatherSection: React.FC = () => {
   useEffect(() => {
     if (!selectedDate) {
       const today = new Date().toISOString().split('T')[0];
-      setSelectedDate(today);
+      setSelectedDate(today); // A função não retorna Promise no useEffect inicial
     }
   }, [selectedDate, setSelectedDate]);
 
@@ -63,8 +64,8 @@ const TodayWeatherSection: React.FC = () => {
     }
   };
 
-  const handleLocationSelect = (selectedLocation: any) => {
-    setLocation({
+  const handleLocationSelect = async (selectedLocation: any) => {
+    await setLocation({
       latitude: selectedLocation.latitude,
       longitude: selectedLocation.longitude,
       city: selectedLocation.city,
@@ -76,15 +77,15 @@ const TodayWeatherSection: React.FC = () => {
     setShowDropdown(false);
   };
 
-  const handleTimeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleTimeChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
     if (value === '') {
       // Horário não definido - mostra min/max nas previsões
-      setSelectedTime(null);
+      await setSelectedTime(null);
     } else {
       const hour = parseInt(value);
       if (!isNaN(hour)) {
-        setSelectedTime({
+        await setSelectedTime({
           hour,
           formatted: `${hour.toString().padStart(2, '0')}:00`
         });
@@ -92,8 +93,8 @@ const TodayWeatherSection: React.FC = () => {
     }
   };
 
-  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedDate(event.target.value);
+  const handleDateChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    await setSelectedDate(event.target.value);
   };
 
   // Gera opções de horário (inclui opção para "todos os horários")
@@ -105,90 +106,79 @@ const TodayWeatherSection: React.FC = () => {
     }))
   ];
 
-  if (!weatherData) {
-    return (
-      <div className="today-weather-section">
-        <div className="section-header">
-          <h2 className="section-title">Weather Today</h2>
-          <div className="weather-controls">
-            <div className="control-group">
-              <select className="control-select location-select">
-                <option>Select Location</option>
-              </select>
-            </div>
-            <div className="control-group">
-              <select className="control-select time-select">
-                <option>Select Time</option>
-              </select>
-            </div>
-            <div className="control-group">
-              <input type="date" className="control-select date-select" />
-            </div>
-          </div>
-        </div>
-        <div className="metrics-loading">Loading weather data...</div>
-      </div>
-    );
+
+
+  // Se não há weatherData e não está carregando, não renderiza nada ou renderiza um estado vazio
+  if (!weatherData && !state.isLoading) {
+    return null;
   }
 
-  // Dados baseados na imagem de design
+  // Acessar os dados da API que são armazenados no contexto
+  const { apiData } = state;
+  
+  // Dados baseados nos retornos reais da API com tratamento de erro
   const metricsData = [
     {
       imageSrc: '/sun.png',
-      value: '28 °C temperature',
+      value: `${weatherData?.temperature || 0}°C temperature`,
       label: '',
       variant: 'temperature' as const
     },
     {
       imageSrc: '/calor-extremo.png',
-      value: '2% chance of extreme heat',
+      value: apiData?.classifications ? `${Math.round(apiData.classifications.very_hot_temp_percentile || 0)}% chance of extreme heat` : '0% chance of extreme heat',
       label: '',
       variant: 'extreme-heat' as const
     },
     {
       imageSrc: '/vento-folha.png',
-      value: '47% chance of strong winds',
+      value: apiData?.classifications ? `${Math.round(apiData.classifications.very_windy_percentile || 0)}% chance of strong winds` : '0% chance of strong winds',
       label: '',
       variant: 'wind' as const
     },
     {
       imageSrc: '/chuva.png',
-      value: '7% chance of humidity',
+      value: apiData?.selectedDayData?.parameters?.RH2M?.value ? `${Math.round(apiData.selectedDayData.parameters.RH2M.value)}% humidity` : '0% humidity',
       label: '',
       variant: 'humidity' as const
     },
     {
       imageSrc: '/nuvem.png',
-      value: '27% chance of overcast',
+      value: apiData?.selectedDayData?.parameters?.CLOUD_AMT?.value ? `${Math.round(apiData.selectedDayData.parameters.CLOUD_AMT.value)}% overcast` : '0% overcast',
       label: '',
       variant: 'fog' as const
     },
     {
       imageSrc: '/chuva-nuvem.png',
-      value: '15% chance of rain',
+      value: `${weatherData?.rainChance || 0}% chance of rain`,
       label: '',
       variant: 'rain' as const
     },
     {
       imageSrc: '/raios.png',
-      value: '3% chance of storm',
+      value: apiData?.classifications ? `${Math.round((apiData.classifications.very_wet_probability || 0) * 100)}% chance of storm` : '0% chance of storm',
       label: '',
       variant: 'storm' as const
     },
     {
       imageSrc: '/neve.png',
-      value: '0% chance of snow',
+      value: apiData?.classifications ? `${Math.round((apiData.classifications.very_snowy_probability || 0) * 100)}% chance of snow` : '0% chance of snow',
       label: '',
       variant: 'snow' as const
     }
   ];
+
+  // Se está carregando, mostra skeleton
+  if (state.isLoading) {
+    return <TodayWeatherSkeleton />;
+  }
+
   return (
     <div className="today-weather-section">
       <div className="section-header">
         <div className="header-left">
-          <h2 className="section-title">Weather Today</h2>
+          <h2 className="section-title">Weather Info</h2>
           <div className="location-display">
-            <span className="location-pin">📍</span>
             <span className="location-text">{location.city} - {location.state}</span>
           </div>
         </div>
@@ -202,12 +192,22 @@ const TodayWeatherSection: React.FC = () => {
                 value={locationQuery}
                 onChange={(e) => handleLocationSearch(e.target.value)}
                 className="control-select location-search-input"
+                disabled={state.isLoading}
               />
 
               {showDropdown && (
                 <div className="location-dropdown">
                   {isSearching && (
-                    <div className="search-loading">Searching...</div>
+                    <div className="search-loading">
+                      <div style={{
+                        height: '12px',
+                        backgroundColor: '#e0e0e0',
+                        borderRadius: '6px',
+                        animation: 'shimmer 1.5s ease-in-out infinite',
+                        background: 'linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)',
+                        backgroundSize: '200% 100%'
+                      }}></div>
+                    </div>
                   )}
 
                   {!isSearching && searchResults.length > 0 && (

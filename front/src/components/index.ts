@@ -8,6 +8,9 @@ export { default as RenewableEnergyCard } from './cards/RenewableEnergyCard/Rene
 export { default as MetricsCard } from './cards/MetricsCard/MetricsCard';
 export { default as TodayWeatherSection } from './cards/TodayWeatherSection/TodayWeatherSection';
 
+// Common
+export { default as LoadingSpinner } from './common/LoadingSpinner';
+
 // Layout
 export { default as Header } from './layout/Header/Header';
 export { default as ActionBar } from './layout/ActionBar/ActionBar';

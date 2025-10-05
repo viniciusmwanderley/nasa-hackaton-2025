@@ -21,13 +21,12 @@ export interface Location {
 }
 
 export interface DayForecast {
-  dayInitial: string; // S, T, Q, Q, S, S, D
-  date: string; // YYYY-MM-DD
-  temperature?: number; // Temperatura específica quando horário definido
-  minTemperature?: number; // Temperatura mínima quando horário não definido
-  maxTemperature?: number; // Temperatura máxima quando horário não definido
-  condition: 'sunny' | 'cloudy' | 'rainy' | 'hot' | 'cold' | 'windy';
-  probability?: number; // Probabilidade de condições adversas
+  dayInitial: string;
+  date: string;
+  minTemperature?: number;
+  maxTemperature?: number;
+  temperature?: number; // Para quando horário específico está definido
+  condition: 'sunny' | 'cloudy' | 'rainy';
 }
 
 export interface PrecipitationData {
@@ -51,14 +50,19 @@ export interface TimeSelection {
 // Estado global da aplicação
 export interface AppState {
   location: Location;
-  selectedDate: string; // YYYY-MM-DD
-  selectedTime: TimeSelection | null; // null quando horário não definido
+  selectedDate: string;
+  selectedTime: TimeSelection | null;
   weatherData: WeatherData | null;
   forecast: DayForecast[];
   precipitationData: PrecipitationData[];
   calendar: CalendarData;
   isLoading: boolean;
   error: string | null;
+  apiData?: {
+    classifications: any;
+    selectedDayData: any;
+    allResults: any[];
+  } | null;
 }
 
 // Configurações da aplicação

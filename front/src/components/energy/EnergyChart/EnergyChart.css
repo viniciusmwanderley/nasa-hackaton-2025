@@ -1,0 +1,61 @@
+.energy-chart {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 450px;
+}
+
+.chart-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin: 0 0 20px 0;
+    text-align: left;
+}
+
+.recharts-container {
+    margin-bottom: 20px;
+}
+
+.chart-footer {
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.cities-label {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Estilização customizada para o Recharts */
+.recharts-cartesian-axis-tick-value {
+    font-size: 11px !important;
+    fill: #666 !important;
+}
+
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+    stroke: #f0f0f0 !important;
+}
+
+.recharts-bar-rectangle:hover {
+    opacity: 0.8;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .energy-chart {
+        max-width: 100%;
+        padding: 15px;
+    }
+    
+    .chart-title {
+        font-size: 14px;
+    }
+    
+    .cities-label {
+        font-size: 12px;
+    }
+}

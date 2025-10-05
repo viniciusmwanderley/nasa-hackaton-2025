@@ -24,6 +24,24 @@
     padding: 16px 10px;
     min-height: 100px;
     justify-content: space-evenly;
+    transition: all 0.3s ease;
+}
+
+.forecast-day.selected-day {
+    background: #007acc;
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 122, 204, 0.3);
+}
+
+.forecast-day.selected-day .day-name {
+    color: white;
+    font-weight: 700;
+}
+
+.forecast-day.selected-day .temp-range {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
 }
 
 .day-name {

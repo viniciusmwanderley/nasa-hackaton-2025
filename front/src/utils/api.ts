@@ -18,8 +18,6 @@ export const geocodeLocation = async (query: string): Promise<Location[]> => {
       return [];
     }
 
-    console.log('URL da requisição:', url);
-    console.log('Dados recebidos:', data);
 
     return data.map((result: any) => {
       return {
@@ -34,6 +32,7 @@ export const geocodeLocation = async (query: string): Promise<Location[]> => {
   } catch (error) {
     console.error('Erro ao buscar localização:', error);
     console.error('URL da requisição:', url);
+    console.log('Chave da API OpenWeather:', OPENWEATHER_API_KEY);
     return [];
   }
 };

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import './MapCard.css';
 import { useApp } from '../../../contexts/AppContext';
+import { MapCardSkeleton } from '../../common/SkeletonLoader';
 
 const MapCard: React.FC = () => {
   const { state } = useApp();
@@ -21,6 +22,11 @@ const MapCard: React.FC = () => {
   useEffect(() => {
     console.log('Mapa atualizado para:', location.city);
   }, [location]);
+
+  // Se está carregando, mostra skeleton
+  if (state.isLoading) {
+    return <MapCardSkeleton />;
+  }
 
   return (
     <div className="map-card">

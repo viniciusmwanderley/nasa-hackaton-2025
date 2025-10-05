@@ -1,36 +1,64 @@
 import React from 'react';
 import './DailyForecast.css';
 import { useApp } from '../../../contexts/AppContext';
+import { DailyForecastSkeleton } from '../../common/SkeletonLoader';
 
 const DailyForecast: React.FC = () => {
     const { state } = useApp();
-    const { forecast, selectedTime } = state;
+    const { forecast, selectedDate } = state;
 
-    // Converte dia da semana de acordo com os dados (baseado na posição)
-    const getDayName = (dayInitial: string, index: number) => {
+    // Gera os nomes dos dias baseado na data selecionada (centro) com 3 antes e 3 depois
+    const getDayNames = () => {
+        const selectedDateObj = new Date(selectedDate + 'T00:00:00');
         const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-        return dayNames[index] || dayInitial;
+        const days = [];
+        
+        // 3 dias antes, dia selecionado, 3 dias depois
+        for (let i = -3; i <= 3; i++) {
+            const currentDate = new Date(selectedDateObj);
+            currentDate.setDate(selectedDateObj.getDate() + i);
+            const dayName = dayNames[currentDate.getDay()];
+            const isSelected = i === 0; // Dia selecionado é quando i = 0
+            days.push({ dayName, isSelected, date: currentDate.toISOString().split('T')[0] });
+        }
+        
+        return days;
     };
+
+    const daysList = getDayNames();
+
+    // Se está carregando, mostra skeleton
+    if (state.isLoading) {
+        return <DailyForecastSkeleton />;
+    }
 
     return (
         <div className="daily-forecast-card">
             <div className="forecast-container">
-                {forecast.map((day, index) => (
-                    <div key={index} className="forecast-day">
-                        <div className="day-name">{getDayName(day.dayInitial, index)}</div>
-                        <div className="temp-range">
-                            {selectedTime ? (
-                                // Quando horário definido, mostra temperatura única
-                                day.temperature ? `${day.temperature}°C` : 'N/A'
-                            ) : (
-                                // Quando horário não definido, mostra min/max
-                                day.minTemperature && day.maxTemperature 
-                                    ? `${day.minTemperature}°C → ${day.maxTemperature}°C`
-                                    : 'N/A'
-                            )}
+                {daysList.map(({ dayName, isSelected, date }, index) => {
+                    // Busca os dados do forecast correspondente ao dia
+                    const dayData = forecast[index] || {};
+                    
+                    return (
+                        <div 
+                            key={date} 
+                            className={`forecast-day ${isSelected ? 'selected-day' : ''}`}
+                        >
+                            <div className="day-name">{dayName}</div>
+                            <div className="temp-range">
+                                {dayData.temperature !== undefined ? (
+                                    // Horário específico definido - mostra temperatura única
+                                    `${dayData.temperature}°C`
+                                ) : (
+                                    // Horário não definido - mostra min/max
+                                    dayData.minTemperature !== undefined && dayData.maxTemperature !== undefined 
+                                        ? `${dayData.minTemperature}°C → ${dayData.maxTemperature}°C`
+                                        : '--°C'
+                                )}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );

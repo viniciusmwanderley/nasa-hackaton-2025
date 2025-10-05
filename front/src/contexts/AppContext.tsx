@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useReducer } from 'react';
 import type { ReactNode } from 'react';
 import type { AppState, AppConfig, Location, WeatherData, DayForecast, PrecipitationData, CalendarData, TimeSelection } from '../types';
-import type { RiskResponseLean } from '../types/api';
+import type { RiskResponseLean, WeatherAnalyzeResponse } from '../types/api';
+import { getTimezoneFromLocationSync } from '../utils/timezone';
 
 // Ações do reducer
 type AppAction =
@@ -15,6 +16,7 @@ type AppAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'UPDATE_FROM_API'; payload: RiskResponseLean }
+  | { type: 'UPDATE_FROM_WEATHER_API'; payload: WeatherAnalyzeResponse }
   | { type: 'RESET_STATE' };
 
 // Estado inicial
@@ -33,37 +35,20 @@ const initialState: AppState = {
     state: "PB",
     country: "Brasil"
   },
-  selectedDate: getCurrentDate(), // Atualiza para usar a data atual
-  selectedTime: null, // Inicializa sem horário definido
-  weatherData: {
-    temperature: 28,
-    description: "Que calorão! Procure abrigo fresco, use roupas claras e beba água.",
-    rainChance: 15,
-    city: "JOÃO PESSOA",
-    state: "PB",
-    condition: "hot"
-  },
-  forecast: [
-    { dayInitial: 'S', date: getCurrentDate(), minTemperature: 24, maxTemperature: 30, condition: 'sunny' },
-    { dayInitial: 'T', date: getCurrentDate(), minTemperature: 22, maxTemperature: 28, condition: 'cloudy' },
-    { dayInitial: 'Q', date: getCurrentDate(), minTemperature: 20, maxTemperature: 26, condition: 'rainy' },
-    { dayInitial: 'Q', date: getCurrentDate(), minTemperature: 21, maxTemperature: 27, condition: 'sunny' },
-    { dayInitial: 'S', date: getCurrentDate(), minTemperature: 23, maxTemperature: 29, condition: 'sunny' },
-    { dayInitial: 'S', date: getCurrentDate(), minTemperature: 25, maxTemperature: 31, condition: 'sunny' },
-    { dayInitial: 'D', date: getCurrentDate(), minTemperature: 26, maxTemperature: 32, condition: 'sunny' }
-  ],
-  precipitationData: Array.from({ length: 31 }, () => ({
-    date: getCurrentDate(),
-    value: Math.floor(Math.random() * 90) + 5
-  })),
+  selectedDate: getCurrentDate(),
+  selectedTime: null,
+  weatherData: null, // Inicia sem dados
+  forecast: [],
+  precipitationData: [],
   calendar: {
     currentMonth: new Date().getMonth(),
     currentYear: new Date().getFullYear(),
     selectedDate: getCurrentDate(),
     availableDates: []
   },
-  isLoading: false,
-  error: null
+  isLoading: true, // Inicia em loading
+  error: null,
+  apiData: null
 };
 
 // Configuração padrão
@@ -133,6 +118,157 @@ function appReducer(state: AppState, action: AppAction): AppState {
         isLoading: false,
         error: null
       };
+
+    case 'UPDATE_FROM_WEATHER_API':
+      try {
+        // Processa dados da API /weather/analyze/
+        const weatherData = action.payload;
+        
+        if (!weatherData || !weatherData.results || !Array.isArray(weatherData.results)) {
+          console.error('Dados da API inválidos:', weatherData);
+          return {
+            ...state,
+            error: 'Dados inválidos recebidos da API',
+            isLoading: false
+          };
+        }
+      
+      // Encontra o resultado para o dia selecionado
+      console.log('Procurando dados para a data:', state.selectedDate);
+      console.log('Datas disponíveis:', weatherData.results.map(r => r.datetime.split('T')[0]));
+      
+      const selectedDateResult = weatherData.results.find(result => 
+        result.datetime.split('T')[0] === state.selectedDate
+      ) || weatherData.results[Math.floor(weatherData.results.length / 2)]; // Fallback para o meio da lista
+      
+      console.log('Dados selecionados para o dia:', selectedDateResult);
+
+      // Mapeia condição baseada nas classificações
+      let condition: 'hot' | 'cold' | 'windy' | 'wet' | 'normal' = 'normal';
+      const classifications = weatherData.classifications;
+      
+      console.log('=== PROCESSANDO CLASSIFICAÇÕES ===');
+      console.log('Percentil de calor:', classifications.very_hot_temp_percentile);
+      console.log('Percentil de vento:', classifications.very_windy_percentile);
+      console.log('Probabilidade de chuva forte:', classifications.very_wet_probability);
+      console.log('Probabilidade de chuva geral:', classifications.rain_probability);
+      
+      if (classifications.very_hot_temp_percentile > 60) condition = 'hot';
+      else if (classifications.very_windy_percentile > 65) condition = 'windy';
+      else if (classifications.very_wet_probability > 0.15 || classifications.rain_probability > 0.4) condition = 'wet';
+
+      // Atualiza weather data com dados reais
+      const temperature = Math.round(selectedDateResult.parameters.T2M.value);
+      const rainChance = Math.round(classifications.rain_probability * 100);
+      const humidity = Math.round(selectedDateResult.parameters.RH2M.value);
+      
+      console.log('=== DADOS PROCESSADOS ===');
+      console.log('Temperatura:', temperature + '°C');
+      console.log('Chance de chuva:', rainChance + '%');
+      console.log('Umidade:', humidity + '%');
+      console.log('Condição:', condition);
+      
+      const updatedWeatherData: WeatherData = {
+        temperature,
+        description: condition === 'hot' ? `Temperatura de ${temperature}°C! Procure abrigo fresco, use roupas claras e beba água.` :
+                    condition === 'windy' ? `Ventos fortes detectados! Cuidado com objetos soltos. Temperatura: ${temperature}°C` :
+                    condition === 'wet' ? `${rainChance}% de chance de chuva! Leve guarda-chuva. Temperatura: ${temperature}°C` :
+                    `Clima agradável de ${temperature}°C para atividades ao ar livre.`,
+        rainChance,
+        city: state.location.city,
+        state: state.location.state,
+        condition
+      };
+
+      // Gera forecast com dados reais baseado na granularidade
+      const isHourlyData = weatherData.meta.granularity === 'hourly';
+      console.log('Tipo de dados:', isHourlyData ? 'Horário específico' : 'Diário (min/max)');
+      console.log('Quantidade de resultados recebidos:', weatherData.results.length);
+      
+      const forecast: DayForecast[] = weatherData.results.slice(0, 7).map((result, index) => {
+        try {
+          const date = result.datetime.split('T')[0];
+          const dayNames = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+          
+          console.log(`Processando resultado ${index + 1}:`, {
+            datetime: result.datetime,
+            T2M: result.parameters?.T2M?.value,
+            T2M_MIN: result.parameters?.T2M_MIN?.value,
+            T2M_MAX: result.parameters?.T2M_MAX?.value
+          });
+          
+          const baseData = {
+            dayInitial: dayNames[index % 7],
+            date,
+            condition: (result.parameters?.PRECTOTCORR?.value || 0) > 5 ? 'rainy' :
+                      (result.parameters?.T2M?.value || 0) > 30 ? 'sunny' :
+                      (result.parameters?.CLOUD_AMT?.value || 0) > 50 ? 'cloudy' : 'sunny'
+          } as DayForecast;
+
+          if (isHourlyData) {
+            // Para dados horários, usa temperatura única
+            if (result.parameters?.T2M?.value !== undefined) {
+              baseData.temperature = Math.round(result.parameters.T2M.value);
+              console.log(`Dia ${index + 1}: ${baseData.temperature}°C (horário específico)`);
+            } else {
+              console.error(`Temperatura T2M não encontrada para o dia ${index + 1}`);
+              baseData.temperature = 0; // Fallback
+            }
+          } else {
+            // Para dados diários, usa min/max
+            if (result.parameters?.T2M_MIN?.value !== undefined && result.parameters?.T2M_MAX?.value !== undefined) {
+              baseData.minTemperature = Math.round(result.parameters.T2M_MIN.value);
+              baseData.maxTemperature = Math.round(result.parameters.T2M_MAX.value);
+              console.log(`Dia ${index + 1}: ${baseData.minTemperature}°C - ${baseData.maxTemperature}°C (min/max)`);
+            } else {
+              console.error(`Temperaturas min/max não encontradas para o dia ${index + 1}`);
+              baseData.minTemperature = 0; // Fallback
+              baseData.maxTemperature = 0; // Fallback
+            }
+          }
+
+          return baseData;
+        } catch (error) {
+          console.error(`Erro ao processar resultado ${index + 1}:`, error);
+          // Retorna dados padrão em caso de erro
+          return {
+            dayInitial: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'][index % 7],
+            date: new Date().toISOString().split('T')[0],
+            temperature: isHourlyData ? 0 : undefined,
+            minTemperature: isHourlyData ? undefined : 0,
+            maxTemperature: isHourlyData ? undefined : 0,
+            condition: 'sunny'
+          } as DayForecast;
+        }
+      });
+
+      // Gera dados de precipitação
+      const precipitationData: PrecipitationData[] = weatherData.results.map(result => ({
+        date: result.datetime.split('T')[0],
+        value: result.parameters.PRECTOTCORR.value
+      }));
+
+        return {
+          ...state,
+          weatherData: updatedWeatherData,
+          forecast,
+          precipitationData,
+          apiData: {
+            classifications: weatherData.classifications,
+            selectedDayData: selectedDateResult,
+            allResults: weatherData.results
+          },
+          isLoading: false,
+          error: null
+        };
+      } catch (error) {
+        console.error('Erro ao processar dados da API:', error);
+        return {
+          ...state,
+          error: 'Erro ao processar dados meteorológicos',
+          isLoading: false
+        };
+      }
     
     case 'RESET_STATE':
       return initialState;
@@ -148,9 +284,9 @@ interface AppContextType {
   config: AppConfig;
   dispatch: React.Dispatch<AppAction>;
   // Ações auxiliares
-  setLocation: (location: Location) => void;
-  setSelectedDate: (date: string) => void;
-  setSelectedTime: (time: TimeSelection | null) => void;
+  setLocation: (location: Location) => Promise<void>;
+  setSelectedDate: (date: string) => Promise<void>;
+  setSelectedTime: (time: TimeSelection | null) => Promise<void>;
   updateCalendarMonth: (month: number, year: number) => void;
   fetchWeatherData: () => Promise<void>;
 }
@@ -165,17 +301,91 @@ interface AppProviderProps {
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
+  // Carrega dados iniciais quando a aplicação inicia
+  React.useEffect(() => {
+    console.log('🚀 Iniciando aplicação - Carregando dados para João Pessoa...');
+    callWeatherAnalyzeAPI(initialState.location, initialState.selectedDate, initialState.selectedTime);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Função para chamar a API weather/analyze
+  const callWeatherAnalyzeAPI = async (location: Location, selectedDate: string, selectedTime: TimeSelection | null) => {
+    console.log('🌤️ Buscando dados da API para:', location.city);
+    
+    const timezone = getTimezoneFromLocationSync(location);
+    
+    // Formatar center_datetime
+    const centerDatetime = selectedTime
+      ? `${selectedDate}T${selectedTime.formatted}:00Z`
+      : `${selectedDate}T00:00:00Z`;
+
+    const params = {
+      latitude: location.latitude,
+      longitude: location.longitude,
+      center_datetime: centerDatetime,
+      target_timezone: timezone,
+      days_before: 3,
+      days_after: 3,
+      granularity: selectedTime ? 'hourly' : 'daily',
+      window_days: 7,
+      ...(selectedTime && {
+        start_year: 2015,
+        hourly_chunk_years: 5
+      })
+    };
+
+    try {
+      const response = await fetch('http://localhost:8000/weather/analyze/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(params)
+      });
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
+
+      const data: WeatherAnalyzeResponse = await response.json();
+      console.log('✅ Dados recebidos da API com sucesso');
+      
+      // Processa e atualiza os dados
+      dispatch({ type: 'UPDATE_FROM_WEATHER_API', payload: data });
+      dispatch({ type: 'SET_LOADING', payload: false });
+
+    } catch (error) {
+      console.error('❌ Erro na API:', error);
+      dispatch({ type: 'SET_LOADING', payload: false });
+      dispatch({ type: 'SET_ERROR', payload: 'Erro ao carregar dados. Tente novamente.' });
+    }
+  };
+
   // Ações auxiliares
-  const setLocation = (location: Location) => {
+  const setLocation = async (location: Location) => {
+    console.log('🚀 Mudando localização para:', location.city);
+    
+    dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'SET_LOCATION', payload: location });
+    
+    await callWeatherAnalyzeAPI(location, state.selectedDate, state.selectedTime);
   };
 
-  const setSelectedDate = (date: string) => {
+  const setSelectedDate = async (date: string) => {
+    console.log('📅 Mudando data para:', date);
+    
+    dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'SET_SELECTED_DATE', payload: date });
+    
+    await callWeatherAnalyzeAPI(state.location, date, state.selectedTime);
   };
 
-  const setSelectedTime = (time: TimeSelection | null) => {
+  const setSelectedTime = async (time: TimeSelection | null) => {
+    console.log('⏰ Mudando horário para:', time?.formatted || 'All Day');
+    
+    dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'SET_SELECTED_TIME', payload: time });
+    
+    await callWeatherAnalyzeAPI(state.location, state.selectedDate, time);
   };
 
   const updateCalendarMonth = (month: number, year: number) => {
