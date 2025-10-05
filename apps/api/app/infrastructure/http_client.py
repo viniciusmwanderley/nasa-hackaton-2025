@@ -12,17 +12,13 @@ import httpx
 logger = logging.getLogger("outdoor_risk_api.http_client")
 
 
-class HTTPClient:
-    """HTTP client with retry logic for external API calls."""
-    
+class HTTPClient:    
     def __init__(self, retries: int = 4, timeout: int = 120):
         self.retries = retries
         self.timeout = timeout
         
     async def get(self, url: str, params: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Perform HTTP GET request with retry logic.
-        
+        """        
         Args:
             url: Request URL
             params: Query parameters

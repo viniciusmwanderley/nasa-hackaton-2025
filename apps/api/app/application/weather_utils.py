@@ -15,9 +15,7 @@ logger = logging.getLogger("outdoor_risk_api.weather_utils")
 
 
 def calculate_heat_index(temp_c: Optional[float], rh_percent: Optional[float]) -> Optional[float]:
-    """
-    Calculate heat index from temperature and relative humidity.
-    
+    """    
     Args:
         temp_c: Temperature in Celsius
         rh_percent: Relative humidity percentage
@@ -47,9 +45,7 @@ def calculate_heat_index(temp_c: Optional[float], rh_percent: Optional[float]) -
 
 
 def calculate_historical_stats(all_series: Dict[str, Dict[str, float]]) -> Dict[str, Optional[WeatherStats]]:
-    """
-    Calculate historical statistics for all weather parameters.
-    
+    """    
     Args:
         all_series: Dictionary mapping parameters to their time series
         
@@ -85,9 +81,7 @@ def predict_with_temporal_regression(
     granularity: Granularity, 
     window_days: int
 ) -> Optional[float]:
-    """
-    Predict weather value using temporal linear regression.
-    
+    """    
     Args:
         series: Historical data series
         target_dt: Target datetime for prediction
@@ -161,9 +155,7 @@ def predict_with_temporal_regression(
 
 
 def get_sanitized_series(all_series: Dict[str, Dict[str, float]], param: str) -> List[float]:
-    """
-    Get sanitized (non-None) values from a parameter series.
-    
+    """    
     Args:
         all_series: All parameter series
         param: Parameter name

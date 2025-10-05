@@ -23,9 +23,7 @@ from .classification_service import WeatherClassificationService
 logger = logging.getLogger("outdoor_risk_api.weather_service")
 
 
-class WeatherAnalysisService(IWeatherAnalysisService):
-    """Main service for weather analysis operations."""
-    
+class WeatherAnalysisService(IWeatherAnalysisService):    
     def __init__(self, weather_repo: IWeatherDataRepository):
         self.weather_repo = weather_repo
         self.classification_service = WeatherClassificationService()
@@ -34,9 +32,7 @@ class WeatherAnalysisService(IWeatherAnalysisService):
         self,
         request: WeatherAnalysisRequest
     ) -> WeatherAnalysisResult:
-        """
-        Perform comprehensive weather analysis for a date range.
-        
+        """        
         Args:
             request: Weather analysis request parameters
             

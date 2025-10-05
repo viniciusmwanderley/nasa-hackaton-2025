@@ -22,7 +22,6 @@ router = APIRouter(prefix="/climate-energy", tags=["climate-energy"])
 
 
 def get_climate_service() -> IClimateEnergyService:
-    """Dependency for climate energy analysis service."""
     container = get_climate_container()
     return container.climate_service
 
@@ -34,21 +33,6 @@ async def analyze_single_location(
     http_request: Request = None
 ) -> LocationResult:
     """
-    Analyze renewable energy potential for a single location using NASA POWER data.
-    
-    This endpoint is optimized for frontend usage where locations are added one by one.
-    
-    Provides comprehensive climate energy analysis including:
-    - Solar energy density calculations (kWh/m²/month)
-    - Wind energy density calculations (kWh/m²/month)  
-    - Raw NASA climatology metrics for reference
-    - Fast response time for real-time frontend updates
-    
-    The analysis considers:
-    - System loss factors for solar installations (80% efficiency)
-    - Reference turbine specifications for wind calculations
-    - Monthly and annual energy density metrics
-    
     Args:
         request: Single location request with latitude and longitude
         climate_service: Injected climate energy analysis service
@@ -174,9 +158,7 @@ async def analyze_location_by_coordinates(
     climate_service: IClimateEnergyService = Depends(get_climate_service),
     http_request: Request = None
 ) -> LocationResult:
-    """
-    Analyze renewable energy potential for coordinates via GET request (alternative endpoint).
-    
+    """    
     Args:
         latitude: Latitude coordinate (-90 to 90)
         longitude: Longitude coordinate (-180 to 180)

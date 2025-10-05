@@ -15,7 +15,6 @@ logger = logging.getLogger("outdoor_risk_api.classification_service")
 
 
 class WeatherClassificationService:
-    """Service for calculating weather classifications and risk assessments."""
     
     def calculate_classifications(
         self,
@@ -25,8 +24,6 @@ class WeatherClassificationService:
         granularity: Granularity
     ) -> WeatherClassifications:
         """
-        Calculate weather classifications for risk assessment.
-        
         Args:
             target_dt_utc: Target datetime in UTC
             daily_values: Current day weather values

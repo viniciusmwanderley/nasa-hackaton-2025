@@ -30,14 +30,6 @@ async def analyze_weather_range(
     http_request: Request = None
 ) -> WeatherAnalysisResult:
     """
-    Analyze weather conditions and risk factors for a date range around a center date.
-    
-    This endpoint provides comprehensive weather analysis including:
-    - Historical weather data and statistics
-    - Weather predictions using temporal regression
-    - Risk classifications (heat, precipitation, wind, snow)
-    - Percentile-based risk assessments
-    
     Args:
         request: Weather analysis request parameters
         weather_service: Injected weather analysis service

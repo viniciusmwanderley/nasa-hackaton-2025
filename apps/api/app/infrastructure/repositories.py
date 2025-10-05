@@ -13,9 +13,7 @@ from .http_client import HTTPClient
 logger = logging.getLogger("outdoor_risk_api.nasa_repository")
 
 
-class NASAWeatherDataRepository(IWeatherDataRepository):
-    """Repository for NASA POWER API weather data."""
-    
+class NASAWeatherDataRepository(IWeatherDataRepository):    
     def __init__(self, http_client: HTTPClient):
         self.http_client = http_client
     
@@ -28,9 +26,7 @@ class NASAWeatherDataRepository(IWeatherDataRepository):
         end_date: date,
         parameters: List[str]
     ) -> Dict[str, Any]:
-        """
-        Fetch temporal weather data from NASA POWER API.
-        
+        """        
         Args:
             lat: Latitude coordinate
             lon: Longitude coordinate
@@ -79,9 +75,7 @@ class NASAWeatherDataRepository(IWeatherDataRepository):
         lon: float,
         parameters: List[str]
     ) -> Dict[str, Any]:
-        """
-        Fetch climatology data from NASA POWER API.
-        
+        """        
         Args:
             lat: Latitude coordinate
             lon: Longitude coordinate
@@ -113,9 +107,7 @@ class NASAWeatherDataRepository(IWeatherDataRepository):
         return await self.http_client.get(url, params)
     
     def extract_param_series(self, json_obj: Dict[str, Any]) -> Dict[str, Dict[str, float]]:
-        """
-        Extract parameter series from NASA API response.
-        
+        """        
         Args:
             json_obj: Raw API response
             
@@ -134,9 +126,7 @@ class NASAWeatherDataRepository(IWeatherDataRepository):
             return {}
     
     def extract_climatology_monthly(self, json_obj: Dict[str, Any]) -> Dict[str, Dict[int, float]]:
-        """
-        Extract monthly climatology data from NASA API response.
-        
+        """        
         Args:
             json_obj: Raw API response
             

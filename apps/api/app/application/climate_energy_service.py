@@ -15,9 +15,7 @@ from ..domain.climate_entities import (
 )
 
 
-class ClimateEnergyService(IClimateEnergyService):
-    """Service for climate energy analysis using NASA POWER data."""
-    
+class ClimateEnergyService(IClimateEnergyService):    
     # API Parameter Mapping
     API_PARAMETERS_MAP: Dict[str, str] = {
         "SolarIrradianceOptimal": "SI_TILTED_AVG_OPTIMAL",
@@ -43,10 +41,7 @@ class ClimateEnergyService(IClimateEnergyService):
         self,
         request: ClimateEnergyAnalysisRequest
     ) -> ClimateEnergyAnalysisResult:
-        """
-        Orchestrates energy potential analysis for a list of locations,
-        focusing on energy density metrics (kWh/m²).
-        
+        """        
         Args:
             request: Climate energy analysis request
             
@@ -106,9 +101,7 @@ class ClimateEnergyService(IClimateEnergyService):
         )
     
     def _calculate_solar_kwh_per_m2(self, api_data: Dict[str, Any]) -> Dict[str, float]:
-        """
-        Calculates solar energy density (kWh/m²/month) for each month.
-        
+        """        
         Args:
             api_data: Dictionary containing NASA API response data
             
@@ -133,9 +126,7 @@ class ClimateEnergyService(IClimateEnergyService):
         return results
     
     def _calculate_wind_kwh_per_m2(self, api_data: Dict[str, Any]) -> Dict[str, float]:
-        """
-        Calculates wind energy density (kWh/m²/month) for each month.
-        
+        """        
         Args:
             api_data: Dictionary containing NASA API response data
             
@@ -169,9 +160,7 @@ class ClimateEnergyService(IClimateEnergyService):
         latitude: float, 
         longitude: float
     ) -> LocationResult:
-        """
-        Analyze energy potential for a single location (optimized for frontend).
-        
+        """        
         Args:
             latitude: Latitude coordinate
             longitude: Longitude coordinate

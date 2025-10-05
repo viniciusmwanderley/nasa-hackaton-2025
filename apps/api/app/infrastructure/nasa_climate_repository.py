@@ -9,9 +9,7 @@ import httpx
 from ..domain.climate_interfaces import INASAClimateRepository
 
 
-class NASAClimateRepository(INASAClimateRepository):
-    """Repository for fetching climate data from NASA POWER API."""
-    
+class NASAClimateRepository(INASAClimateRepository):    
     def __init__(self):
         self.base_url = "https://power.larc.nasa.gov/api/temporal/climatology/point"
         self.community = "RE"
@@ -26,9 +24,7 @@ class NASAClimateRepository(INASAClimateRepository):
         lon: float,
         params_list: List[str]
     ) -> Dict[str, Any]:
-        """
-        Fetch climatology data from NASA POWER API for a single coordinate.
-        
+        """        
         Args:
             lat: Latitude coordinate
             lon: Longitude coordinate
@@ -55,9 +51,7 @@ class NASAClimateRepository(INASAClimateRepository):
         return data.get("properties", {}).get("parameter", {})
     
     async def _http_get_async(self, url: str, params: dict) -> Dict[str, Any]:
-        """
-        Performs async HTTP GET request with robust error handling and retries.
-        
+        """        
         Args:
             url: The URL to make the request to
             params: Query parameters for the request
