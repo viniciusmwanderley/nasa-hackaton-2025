@@ -8,10 +8,10 @@ const Header: React.FC = () => {
         <div className="header-brand">
           <div className="climadata-logo">
             <img src="/weatherdata.png" alt="CLIMADATA" className="logo-image" />
-            <div className="loading-info">
-              Loading may take up to 2 minutes as we compile the necessary information for you.
-            </div>
           </div>
+        </div>
+        <div className="loading-info">
+          Loading may take up to 2 minutes as we compile the necessary information for you.
         </div>
       </div>
     </div>
