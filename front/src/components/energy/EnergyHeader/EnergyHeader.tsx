@@ -193,7 +193,7 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({
                                         <TextField
                                             size="small"
                                             placeholder={selectedLocations.length === 5 
-                                                ? "Maximum 5 locations reached" 
+                                                ? "5 locations reached" 
                                                 : `Search locations (${selectedLocations.length}/5)`
                                             }
                                             value={locationQuery}
