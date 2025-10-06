@@ -13,7 +13,6 @@ const CalendarCard: React.FC = () => {
         const userTimezone = getTimezoneFromLocationSync(location);
         const now = new Date();
         
-        // Use Intl.DateTimeFormat para obter a data no timezone correto
         const formatter = new Intl.DateTimeFormat('en-CA', {
             timeZone: userTimezone,
             year: 'numeric',
@@ -21,7 +20,6 @@ const CalendarCard: React.FC = () => {
             day: '2-digit'
         });
         
-        // Retorna no formato YYYY-MM-DD
         return formatter.format(now);
     };
 

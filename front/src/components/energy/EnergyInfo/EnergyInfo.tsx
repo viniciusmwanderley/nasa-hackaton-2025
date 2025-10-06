@@ -48,9 +48,9 @@ const EnergyInfo: React.FC<EnergyInfoProps> = ({
                     group: 'solar'
                 },
                 {
-                    title: ' Solar Irradiance Index',
+                    title: 'Daily Solar Irradiance Index',
                     value: '--',
-                    unit: 'kWh/m²/day',
+                    unit: 'kWh/m²',
                     backgroundColor: '#C75906',
                     backgroundImage: '/ClimateIndicatorVectorO.png',
                     textColor: 'white',
@@ -88,9 +88,9 @@ const EnergyInfo: React.FC<EnergyInfoProps> = ({
                 group: 'solar'
             },
             {
-                title: ' Solar Irradiance Index',
+                title: 'Daily Solar Irradiance Index',
                 value: currentCityData.indicators.solarIrradiance.toFixed(2),
-                unit: 'kWh/m²/day',
+                unit: 'kWh/m²',
                 backgroundColor: '#C75906',
                 backgroundImage: '/ClimateIndicatorVectorO.png',
                 textColor: 'white',
