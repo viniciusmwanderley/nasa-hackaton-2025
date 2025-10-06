@@ -147,6 +147,11 @@
     color: #666;
 }
 
+.dropdownIcon {
+    color: #666;
+    cursor: pointer;
+}
+
 .selectedCitiesContainer {
     position: absolute;
     top: 100%;

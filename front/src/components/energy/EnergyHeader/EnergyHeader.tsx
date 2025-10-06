@@ -9,9 +9,7 @@ import {
     ClickAwayListener,
     Select,
     MenuItem,
-    IconButton,
-    Button,
-    Box
+    Button
 } from '@mui/material';
 import { Search, Close, ArrowDropDown, Send, ArrowBack } from '@mui/icons-material';
 import styles from './EnergyHeader.module.css';
@@ -39,7 +37,8 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({
     const [isSearching, setIsSearching] = useState(false);
     const [searchResults, setSearchResults] = useState<Location[]>([]);
     const [selectedLocations, setSelectedLocations] = useState<Location[]>([]);
-    const [showDropdown, setShowDropdown] = useState(false); 
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [showSelectedCities, setShowSelectedCities] = useState(false); 
 
     const handleLocationSearch = useCallback(async (query: string) => {
         setLocationQuery(query);
@@ -78,6 +77,7 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({
             const newLocations = [...selectedLocations, location];
             setSelectedLocations(newLocations);
             onLocationsChange?.(newLocations);
+            setShowSelectedCities(true);
         }
         setLocationQuery('');
         setSearchResults([]);
@@ -92,6 +92,7 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({
         onLocationsChange?.(newLocations);
         if (newLocations.length === 0) {
             setShowDropdown(false);
+            setShowSelectedCities(false);
         }
     };
 
@@ -99,15 +100,24 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({
         setSelectedLocations([]);
         onLocationsChange?.([]);
         setShowDropdown(false);
+        setShowSelectedCities(false);
         setLocationQuery('');
         setSearchResults([]);
     }
 
     const handleClickAway = () => {
-        if (selectedLocations.length < 5) {
-            setShowDropdown(false);
-        }
+        setShowDropdown(false);
+        setShowSelectedCities(false);
         setSearchResults([]);
+    };
+
+    const handleInputClick = () => {
+        if (selectedLocations.length > 0) {
+            setShowSelectedCities(!showSelectedCities);
+        }
+        if (selectedLocations.length < 5) {
+            setShowDropdown(true);
+        }
     };
 
     const isGenerateEnabled = selectedLocations.length >= 1 && selectedLocations.length <= 5 && !isAnalyzing;
@@ -188,7 +198,8 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({
                                             }
                                             value={locationQuery}
                                             onChange={(e) => handleLocationSearch(e.target.value)}
-                                            onFocus={() => selectedLocations.length < 5 && setShowDropdown(true)}
+                                            onFocus={handleInputClick}
+                                            onClick={handleInputClick}
                                             variant="outlined"
                                             className={styles.citiesInput}
                                             disabled={selectedLocations.length === 5}
@@ -208,11 +219,21 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({
                                                             Max
                                                         </Typography>
                                                     </InputAdornment>
+                                                ) : selectedLocations.length > 0 ? (
+                                                    <InputAdornment position="end">
+                                                        <ArrowDropDown 
+                                                            className={styles.dropdownIcon}
+                                                            style={{ 
+                                                                transform: showSelectedCities ? 'rotate(180deg)' : 'rotate(0deg)',
+                                                                transition: 'transform 0.2s ease'
+                                                            }}
+                                                        />
+                                                    </InputAdornment>
                                                 ) : null
                                             }}
                                         />
 
-                                        {selectedLocations.length > 0 && (
+                                        {selectedLocations.length > 0 && showSelectedCities && (
                                             <div className={styles.selectedCitiesContainer}>
                                                 <div className={styles.chipsWrapper}>
                                                     {selectedLocations.map((location, index) => (
