@@ -20,22 +20,38 @@ type AppAction =
   | { type: 'RESET_STATE' };
 
 // Initial state
-const getCurrentDate = () => {
+const getCurrentDate = (location?: Location) => {
+  if (location) {
+    const timezone = getTimezoneFromLocationSync(location);
+    const now = new Date();
+    
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+    
+    return formatter.format(now);
+  }
+  
   const today = new Date();
   return today.toISOString().split('T')[0];
 };
 
 
 
+const initialLocation: Location = {
+  latitude: -7.1195,
+  longitude: -34.8473,
+  city: "JOÃO PESSOA",
+  state: "PB",
+  country: "Brasil"
+};
+
 const initialState: AppState = {
-  location: {
-    latitude: -7.1195,
-    longitude: -34.8473,
-    city: "JOÃO PESSOA",
-    state: "PB",
-    country: "Brasil"
-  },
-  selectedDate: getCurrentDate(),
+  location: initialLocation,
+  selectedDate: getCurrentDate(initialLocation), 
   selectedTime: null,
   weatherData: null, 
   forecast: [],
@@ -43,7 +59,7 @@ const initialState: AppState = {
   calendar: {
     currentMonth: new Date().getMonth(),
     currentYear: new Date().getFullYear(),
-    selectedDate: getCurrentDate(),
+    selectedDate: getCurrentDate(initialLocation), 
     availableDates: []
   },
   isLoading: true, 
@@ -243,11 +259,12 @@ interface AppContextType {
   state: AppState;
   config: AppConfig;
   dispatch: React.Dispatch<AppAction>;
-  setLocation: (location: Location) => Promise<void>;
-  setSelectedDate: (date: string) => Promise<void>;
-  setSelectedTime: (time: TimeSelection | null) => Promise<void>;
+  setLocation: (location: Location) => void;
+  setSelectedDate: (date: string) => void;
+  setSelectedTime: (time: TimeSelection | null) => void;
   updateCalendarMonth: (month: number, year: number) => void;
   fetchWeatherData: () => Promise<void>;
+  analyzeWeather: (customLocation?: Location, customDate?: string, customTime?: TimeSelection | null) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -262,7 +279,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   React.useEffect(() => {
     callWeatherAnalyzeAPI(initialState.location, initialState.selectedDate, initialState.selectedTime);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const callWeatherAnalyzeAPI = async (location: Location, selectedDate: string, selectedTime: TimeSelection | null) => {    
     const timezone = getTimezoneFromLocationSync(location);
@@ -314,26 +331,26 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   };
 
   // Auxiliary actions
-  const setLocation = async (location: Location) => {
-  
-    dispatch({ type: 'SET_LOADING', payload: true });
+  const setLocation = (location: Location) => {
     dispatch({ type: 'SET_LOCATION', payload: location });
-    
-    await callWeatherAnalyzeAPI(location, state.selectedDate, state.selectedTime);
   };
 
-  const setSelectedDate = async (date: string) => {    
-    dispatch({ type: 'SET_LOADING', payload: true });
+  const setSelectedDate = (date: string) => {    
     dispatch({ type: 'SET_SELECTED_DATE', payload: date });
-    
-    await callWeatherAnalyzeAPI(state.location, date, state.selectedTime);
   };
 
-  const setSelectedTime = async (time: TimeSelection | null) => {    
-    dispatch({ type: 'SET_LOADING', payload: true });
+  const setSelectedTime = (time: TimeSelection | null) => {    
     dispatch({ type: 'SET_SELECTED_TIME', payload: time });
+  };
+
+  const analyzeWeather = async (customLocation?: Location, customDate?: string, customTime?: TimeSelection | null) => {
+    dispatch({ type: 'SET_LOADING', payload: true });
     
-    await callWeatherAnalyzeAPI(state.location, state.selectedDate, time);
+    const locationToUse = customLocation ?? state.location;
+    const dateToUse = customDate ?? state.selectedDate;
+    const timeToUse = customTime !== undefined ? customTime : state.selectedTime;
+    
+    await callWeatherAnalyzeAPI(locationToUse, dateToUse, timeToUse);
   };
 
   const updateCalendarMonth = (month: number, year: number) => {
@@ -423,6 +440,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
       dispatch({ type: 'UPDATE_FROM_API', payload: mockApiResponse });
     } catch (error) {
+      console.error('Error fetching weather data:', error);
       dispatch({ type: 'SET_ERROR', payload: 'Erro ao buscar dados meteorológicos' });
     }
   };
@@ -435,7 +453,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setSelectedDate,
     setSelectedTime,
     updateCalendarMonth,
-    fetchWeatherData
+    fetchWeatherData,
+    analyzeWeather
   };
 
   return (

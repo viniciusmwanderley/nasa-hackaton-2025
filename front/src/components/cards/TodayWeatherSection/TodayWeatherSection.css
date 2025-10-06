@@ -181,6 +181,38 @@
   min-width: 140px;
 }
 
+.control-button {
+  padding: 8px 16px;
+  border: 1.5px solid #0B357E;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 100px;
+  background: white;
+  color: #0B357E;
+}
+
+.analyze-button {
+  background: #0B357E;
+  color: white;
+}
+
+.analyze-button:hover:not(:disabled) {
+  background: #083461;
+  border-color: #083461;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(11, 53, 126, 0.2);
+}
+
+.analyze-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

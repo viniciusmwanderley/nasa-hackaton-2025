@@ -7,17 +7,17 @@ import type { Location } from '../types/app';
 export const getTimezoneFromLocation = async (location: Location): Promise<string> => {
   try {
     const response = await fetch(
-      `https://api.timezonedb.com/v2.1/get-time-zone?key=demo&format=json&by=position&lat=${location.latitude}&lng=${location.longitude}`
+      `https://api.timezonedb.com/v2.1/get-time-zone?key=${import.meta.env.VITE_TIMEZONEDB_API_KEY}&format=json&by=position&lat=${location.latitude}&lng=${location.longitude}`
     );
     
     if (response.ok) {
       const data = await response.json();
-      if (data.zoneName) {
+      if (data.status === 'OK' && data.zoneName) {
         return data.zoneName;
       }
     }
   } catch (error) {
-    console.warn('Error fetching timezone from API:', error);
+    console.warn('Error fetching timezone from API, using fallback:', error);
   }
 
   return getTimezoneByCountryAndCoordinates(location);
@@ -27,19 +27,20 @@ export const getTimezoneFromLocation = async (location: Location): Promise<strin
 const getTimezoneByCountryAndCoordinates = (location: Location): string => {
   const { country, latitude, longitude } = location;
 
-  if (country === 'BR' || country === 'Brazil') {
+  if (country === 'BR' || country === 'Brazil' || country === 'Brasil') {
+    if (longitude > -34) {
+      return 'America/Noronha';
+    }
+    
     if (longitude < -67) {
       return 'America/Rio_Branco';
     }
-    else if (longitude < -57 || (latitude > -10 && longitude < -60)) {
+
+    if (longitude < -54) {
       return 'America/Manaus';
     }
-    else if (latitude < -3 && longitude > -33) {
-      return 'America/Noronha';
-    }
-    else {
-      return 'America/Sao_Paulo';
-    }
+    
+    return 'America/Sao_Paulo';
   }
 
   if (country === 'US' || country === 'United States') {

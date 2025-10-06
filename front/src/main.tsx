@@ -5,6 +5,7 @@ import './index.css'
 import Dashboard from './pages/Dashboard/Dashboard.tsx'
 import EnergyPanel from './pages/EnergyPanel.tsx'
 import { AppProvider } from './contexts/AppContext'
+import { FilterProvider } from './contexts/FilterContext'
 
 const EnergyPanelWithNavigation = () => {
   const navigate = useNavigate()
@@ -20,10 +21,12 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <AppProvider>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/energy-panel" element={<EnergyPanelWithNavigation />} />
-        </Routes>
+        <FilterProvider>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/energy-panel" element={<EnergyPanelWithNavigation />} />
+          </Routes>
+        </FilterProvider>
       </AppProvider>
     </BrowserRouter>
   </StrictMode>,

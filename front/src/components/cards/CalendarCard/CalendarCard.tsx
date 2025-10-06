@@ -1,10 +1,29 @@
 import React from 'react';
 import './CalendarCard.css';
 import { useApp } from '../../../contexts/AppContext';
+import { useFilter } from '../../../contexts/FilterContext';
+import { getTimezoneFromLocationSync } from '../../../utils/timezone';
 
 const CalendarCard: React.FC = () => {
-    const { state, setSelectedDate, setSelectedTime, updateCalendarMonth } = useApp();
-    const { calendar, selectedDate } = state;
+    const { state, updateCalendarMonth } = useApp();
+    const { calendar, location } = state;
+    const { localDate, setLocalDate } = useFilter();
+
+    const getTodayInUserTimezone = (): string => {
+        const userTimezone = getTimezoneFromLocationSync(location);
+        const now = new Date();
+        
+        // Use Intl.DateTimeFormat para obter a data no timezone correto
+        const formatter = new Intl.DateTimeFormat('en-CA', {
+            timeZone: userTimezone,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+        
+        // Retorna no formato YYYY-MM-DD
+        return formatter.format(now);
+    };
 
     const daysOfWeek = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
     const monthNames = [
@@ -19,6 +38,7 @@ const CalendarCard: React.FC = () => {
         
         const days = [];
         const current = new Date(startDate);
+        const todayInUserTimezone = getTodayInUserTimezone();
         
         for (let i = 0; i < 42; i++) {
             const isCurrentMonth = current.getMonth() === month;
@@ -28,8 +48,8 @@ const CalendarCard: React.FC = () => {
                 day: current.getDate(),
                 dateString,
                 isCurrentMonth,
-                isToday: dateString === new Date().toISOString().split('T')[0],
-                isSelected: dateString === selectedDate
+                isToday: dateString === todayInUserTimezone,
+                isSelected: dateString === localDate
             });
             
             current.setDate(current.getDate() + 1);
@@ -52,8 +72,9 @@ const CalendarCard: React.FC = () => {
         updateCalendarMonth(newMonth, newYear);
     };
 
-    const handleDateClick = async (dateString: string) => {
-        await setSelectedDate(dateString);
+    const handleDateClick = (dateString: string) => {
+        // Only update the local date for the datepicker, don't affect other components
+        setLocalDate(dateString);
     };
 
     return (
