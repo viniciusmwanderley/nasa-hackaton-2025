@@ -71,8 +71,10 @@ const CalendarCard: React.FC = () => {
     };
 
     const handleDateClick = (dateString: string) => {
-        // Only update the local date for the datepicker, don't affect other components
+        // Update the local date and mark it as user-changed to prevent auto-sync
         setLocalDate(dateString);
+        // Store a flag in localStorage to indicate user made a manual change
+        localStorage.setItem('userChangedDate', 'true');
     };
 
     return (

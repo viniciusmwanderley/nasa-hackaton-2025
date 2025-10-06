@@ -22,20 +22,64 @@ const TodayWeatherSection: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Flag to track if user has manually changed local values
+  const [hasUserChangedDate, setHasUserChangedDate] = useState(() => {
+    return localStorage.getItem('userChangedDate') === 'true';
+  });
+  const [hasUserChangedTime, setHasUserChangedTime] = useState(() => {
+    return localStorage.getItem('userChangedTime') === 'true';
+  });
+  const [hasUserChangedLocation, setHasUserChangedLocation] = useState(() => {
+    return localStorage.getItem('userChangedLocation') === 'true';
+  });
+
   useEffect(() => {
     if (!selectedDate) {
       const today = new Date().toISOString().split('T')[0];
       setSelectedDate(today); 
     }
-    // Sync local states with global state (but keep localTime as null for "All Day" default)
-    setLocalDate(selectedDate);
-    // Only sync localTime if selectedTime is not null (user has made a specific hour selection)
-    if (selectedTime !== null) {
+    
+    // Only sync local states with global state if user hasn't manually changed them
+    if (!hasUserChangedDate) {
+      setLocalDate(selectedDate);
+    }
+    
+    // Only sync localTime if selectedTime is not null and user hasn't changed it manually
+    if (selectedTime !== null && !hasUserChangedTime) {
       setLocalTime(selectedTime);
     }
-    setLocalLocation(location);
-    setLocationQuery(`${location.city}, ${location.state}`);
-  }, [selectedDate, selectedTime, location, setSelectedDate, setLocalDate]);
+    
+    // Only sync location if user hasn't manually changed it
+    if (!hasUserChangedLocation) {
+      setLocalLocation(location);
+      setLocationQuery(`${location.city}, ${location.state}`);
+    }
+  }, [selectedDate, selectedTime, location, setSelectedDate, setLocalDate, hasUserChangedDate, hasUserChangedTime, hasUserChangedLocation]);
+
+  // Listen for changes in localStorage to sync flags across components
+  useEffect(() => {
+    const checkLocalStorage = () => {
+      const dateChanged = localStorage.getItem('userChangedDate') === 'true';
+      const timeChanged = localStorage.getItem('userChangedTime') === 'true';
+      const locationChanged = localStorage.getItem('userChangedLocation') === 'true';
+      
+      if (dateChanged !== hasUserChangedDate) {
+        setHasUserChangedDate(dateChanged);
+      }
+      if (timeChanged !== hasUserChangedTime) {
+        setHasUserChangedTime(timeChanged);
+      }
+      if (locationChanged !== hasUserChangedLocation) {
+        setHasUserChangedLocation(locationChanged);
+      }
+    };
+
+    // Check immediately and set up an interval to check periodically
+    checkLocalStorage();
+    const interval = setInterval(checkLocalStorage, 100);
+
+    return () => clearInterval(interval);
+  }, [hasUserChangedDate, hasUserChangedTime, hasUserChangedLocation]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -88,14 +132,18 @@ const TodayWeatherSection: React.FC = () => {
     setLocationQuery(`${selectedLocation.city}, ${selectedLocation.state}`);
     setSearchResults([]);
     setShowDropdown(false);
+    setHasUserChangedLocation(true);
+    localStorage.setItem('userChangedLocation', 'true');
   };
 
-  const handleTimeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleTimeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
+    
     if (value === '') {
+      // "All Day" selected
       setLocalTime(null);
     } else {
-      const hour = parseInt(value);
+      const hour = parseInt(value, 10);
       if (!isNaN(hour)) {
         setLocalTime({
           hour,
@@ -103,10 +151,14 @@ const TodayWeatherSection: React.FC = () => {
         });
       }
     }
+    setHasUserChangedTime(true);
+    localStorage.setItem('userChangedTime', 'true');
   };
 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLocalDate(event.target.value);
+    setHasUserChangedDate(true);
+    localStorage.setItem('userChangedDate', 'true');
   };
 
   const handleAnalyze = useCallback(async () => {
@@ -114,6 +166,14 @@ const TodayWeatherSection: React.FC = () => {
     setSelectedDate(localDate);
     setSelectedTime(localTime);
     setLocation(localLocation);
+    
+    // Reset the flags after analyzing, so the component can sync with new results
+    setHasUserChangedDate(false);
+    setHasUserChangedTime(false);
+    setHasUserChangedLocation(false);
+    localStorage.removeItem('userChangedDate');
+    localStorage.removeItem('userChangedTime');
+    localStorage.removeItem('userChangedLocation');
     
     // Trigger the analysis with the local values directly
     await analyzeWeather(localLocation, localDate, localTime);
@@ -134,19 +194,19 @@ const TodayWeatherSection: React.FC = () => {
   const metricsData = [
     {
       imageSrc: '/sun.png',
-      value: `${weatherData?.temperature || 27}°C temperature`,
+      value: `${weatherData?.temperature}°C temperature`,
       label: '',
       variant: 'temperature' as const
     },
     {
       imageSrc: '/calor-extremo.png',
-      value: apiData?.classifications ? `${Math.round(apiData.classifications.very_hot_temp_percentile || 0)}% chance of extreme heat` : 'Select filters and analyze for data',
+      value: apiData?.classifications ? `${Math.round(apiData.classifications.very_hot_temp_percentile)}% chance of extreme heat` : 'Select filters and analyze for data',
       label: '',
       variant: 'extreme-heat' as const
     },
     {
       imageSrc: '/vento-folha.png',
-      value: apiData?.classifications ? `${Math.round(apiData.classifications.very_windy_percentile || 0)}% chance of strong winds` : 'Select filters and analyze for data',
+      value: apiData?.classifications ? `${Math.round(apiData.classifications.very_windy_percentile )}% chance of strong winds` : 'Select filters and analyze for data',
       label: '',
       variant: 'wind' as const
     },
@@ -164,19 +224,19 @@ const TodayWeatherSection: React.FC = () => {
     },
     {
       imageSrc: '/chuva-nuvem.png',
-      value: `${weatherData?.rainChance || 0}% chance of rain`,
+      value: `${weatherData?.rainChance}% chance of rain`,
       label: '',
       variant: 'rain' as const
     },
     {
       imageSrc: '/raios.png',
-      value: apiData?.classifications ? `${Math.round((apiData.classifications.very_wet_probability || 0) * 100)}% chance of storm` : 'Select filters and analyze for data',
+      value: apiData?.classifications ? `${Math.round((apiData.classifications.very_wet_probability ) * 100)}% chance of storm` : 'Select filters and analyze for data',
       label: '',
       variant: 'storm' as const
     },
     {
       imageSrc: '/neve.png',
-      value: apiData?.classifications ? `${Math.round((apiData.classifications.very_snowy_probability || 0) * 100)}% chance of snow` : 'Select filters and analyze for data',
+      value: apiData?.classifications ? `${Math.round((apiData.classifications.very_snowy_probability ) * 100)}% chance of snow` : 'Select filters and analyze for data',
       label: '',
       variant: 'snow' as const
     }
