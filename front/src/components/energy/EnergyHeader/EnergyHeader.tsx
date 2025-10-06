@@ -129,6 +129,9 @@ const EnergyHeader: React.FC<EnergyHeaderProps> = ({
                         className={styles.logoImage}
                     />
                 </div>
+                <div className={styles.loadingInfo}>
+                    Loading may take up to 2 minutes as we compile the necessary information for you.
+                </div>
             </div>
 
             <Paper className={styles.whiteCard} elevation={2}>
